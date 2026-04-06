@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXNYA.US | The Premier US Crypto Exchange</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Default Theme (Black & Gold) --- */
+        :root {
+            --bg-base: #0B0E11;      
+            --bg-elevated: #181A20;  
+            --bg-hover: #2B3139;     
+            --brand-yellow: #FCD535; 
+            --brand-yellow-hover: #F0B90B;
+            --text-primary: #EAECEF;
+            --text-secondary: #848E9C;
+            --trade-green: #0ECB81;
+            --trade-red: #F6465D;
+            --border-light: #2B3139;
+        }
+
+        /* --- Light Theme (White & Gold) --- */
+        body.light-theme {
+            --bg-base: #FFFFFF;      
+            --bg-elevated: #F8F9FA;  
+            --bg-hover: #EAECEF;     
+            --brand-yellow: #D4AF37; /* Slightly darker gold for better contrast on white */
+            --brand-yellow-hover: #b5952f;
+            --text-primary: #1E2329;
+            --text-secondary: #555555;
+            --border-light: #EAECEF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Added smooth transitions for background and color properties */
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.5;
+            position: relative;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        nav, .exchange-widget, .input-group, .feature-item, table td, table th, footer {
+            transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* --- Scroll Animation --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 64px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-base);
+            border-bottom: 1px solid var(--border-light);
+            z-index: 1000;
+        }
+
+        .nav-left, .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--brand-yellow);
+            letter-spacing: 0.5px;
+            margin-right: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo a {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            width: 15%;
+            height: 5%;
+        }
+
+        /* --- Logo Theme Toggle Logic --- */
+        .light-logo {
+            display: none;
+            width: 15%;
+            height: 5%;
+        }
+        body.light-theme .dark-logo {
+            display: none;
+        }
+        body.light-theme .light-logo {
+            display: block;
+        }
+        
+        /* Diamond element mimicking the brand DNA */
+        .diamond-logo img {
+            width: 26px;
+            height: 26px;
+        }
+
+        .nav-links{
+            display: flex;
+            gap: 9%;
+            width: 90%;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--brand-yellow);
+        }
+
+        .btn-text {
+            background: transparent;
+            color: var(--text-primary);
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .btn-text:hover { color: var(--brand-yellow); }
+
+        .btn-primary {
+            background-color: var(--brand-yellow);
+            color: #1E2329;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover { background-color: var(--brand-yellow-hover); }
+
+        /* Theme Toggle Button */
+        .theme-btn {
+            background: transparent;
+            border: 1px solid var(--brand-yellow);
+            color: var(--brand-yellow);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .theme-btn:hover {
+            background: var(--brand-yellow);
+            color: #1E2329;
+        }
+
+        /* --- Hero Section --- */
+        #hero {
+            padding: 140px 24px 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .hero-content {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: rgba(252, 213, 53, 0.1);
+            color: var(--brand-yellow);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-size: 56px;
+            font-weight: 600;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        /* US-Style Exchange Widget */
+        .exchange-widget {
+            background: var(--bg-elevated);
+            padding: 32px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-light);
+        }
+
+        .widget-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            background: var(--bg-base); 
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.2s;
+        }
+        
+        .input-group:hover {
+            border-color: var(--text-secondary);
+        }
+
+        .input-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .input-group input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 20px;
+            font-weight: 600;
+            outline: none;
+            width: 100%;
+        }
+
+        .currency-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-elevated);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .widget-btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+
+        /* --- Live Markets Table --- */
+        #markets {
+            max-width: 1200px;
+            margin: 0 auto 80px;
+            padding: 0 24px;
+        }
+
+        .market-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .market-header h2 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .market-header a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .market-header a:hover { color: var(--brand-yellow); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 16px 8px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        td {
+            padding: 16px 8px;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 15px;
+            font-weight: 500;
+            vertical-align: middle;
+            transition: background-color 0.2s;
+        }
+
+        tr:hover td {
+            background-color: var(--bg-hover);
+            cursor: pointer;
+        }
+
+        .asset-col {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .asset-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        .asset-symbol { font-weight: 600; color: var(--text-primary); }
+        .asset-name { font-size: 12px; color: var(--text-secondary); margin-left: 8px;}
+
+        .price-up { color: var(--trade-green); }
+        .price-down { color: var(--trade-red); }
+
+        /* Flashing Animation for Live Prices */
+        @keyframes flashUp { 0% { background-color: rgba(14, 203, 129, 0.15); } 100% { background-color: transparent; } }
+        @keyframes flashDown { 0% { background-color: rgba(246, 70, 93, 0.15); } 100% { background-color: transparent; } }
+        .flash-up { animation: flashUp 0.8s ease-out; color: var(--trade-green); }
+        .flash-down { animation: flashDown 0.8s ease-out; color: var(--trade-red); }
+
+        .trade-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            background: var(--bg-elevated);
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        tr:hover .trade-link {
+            background: var(--brand-yellow);
+            color: #000;
+        }
+
+        /* --- US Compliance & Features --- */
+        #features {
+            background-color: var(--bg-elevated);
+            padding: 80px 24px;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .feature-item h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-primary);
+        }
+
+        .feature-item p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* --- Footer --- */
+        footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 24px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            line-height: 1.8;
+            border-top: 1px solid var(--border-light);
+        }
+
+        footer .disclaimer {
+            margin-bottom: 24px;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @media (max-width: 900px) {
+            #hero { flex-direction: column; text-align: center; padding-top: 100px; }
+            .hero-content { align-items: center; display: flex; flex-direction: column; }
+            .nav-links { display: none; }
+            .features-grid { grid-template-columns: 1fr; }
+            .hide-mobile { display: none; }
+            #particle-canvas{display: none;}
+        }
+        
+         #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            background-size: cover;
+        }
+    </style>
+    
+</head>
+<body>
+    <canvas id="particle-canvas"></canvas>
+    <nav>
+        <div class="nav-left">
+            <div class="logo">
+                <a href="./kdn.html">
+                    <img src=".//WhatsApp Image 2026-04-03 at 4.24.59 AM.jpeg" alt="EXNYA" class="dark-logo">
+                    <img src="./Gemini_Generated_Image_66zlk566zlk566zl.png" alt="EXNYA" class="light-logo">
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="#">Buy Crypto</a>
+                <a href="#">Markets</a>
+                <a href="#">Trade</a>
+                <a href="#">Staking</a>
+                <a href="#">OTC</a>
+                <a href="./abut.html">About</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">Light Mode</button>
+            <a href="./pl.html"><button class="btn-text">Log In</button></a>
+            <a href="./xx .html"><button class="btn-primary">Sign Up</button></a>
+        </div>
+    </nav>
+
+    <section id="hero">
+        <div class="hero-content reveal">
+            <span class="hero-tag">Zero Fees on BTC Trading</span>
+            <h1 class="hero-title">Trade crypto in the US with confidence</h1>
+            <p class="hero-subtitle">Buy, sell, and stake over 150+ cryptocurrencies on America's premier compliant digital asset exchange. Industry-leading security with incredibly low fees.</p>
+            <button class="btn-primary" style="padding: 12px 24px; font-size: 16px;">Get Started</button>
+        </div>
+
+        <div class="exchange-widget reveal">
+            <div class="widget-title">Buy Crypto</div>
+            
+            <div class="input-group">
+                <div>
+                    <div class="input-label">Spend</div>
+                    <input type="text" value="1,000" id="spend-input">
+                </div>
+                <div class="currency-badge">
+                    🇺🇸 USD
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div>
+                    <div class="input-label">Receive</div>
+                    <input type="text" value="0.0145" readonly id="receive-input">
+                </div>
+                <div class="currency-badge" style="background: rgba(252, 213, 53, 0.2); color: var(--brand-yellow);">
+                    ₿ BTC
+                </div>
+            </div>
+
+            <button class="btn-primary widget-btn" onclick="alert('Redirecting to secure signup...')">Buy BTC</button>
+        </div>
+    </section>
+
+    <section id="markets" class="reveal">
+        <div class="market-header">
+            <h2>Market Trend</h2>
+            <a href="#">View All Markets ></a>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>24h Change</th>
+                    <th class="hide-mobile">24h Volume</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody id="market-body">
+                </tbody>
+        </table>
+    </section>
+
+    <section id="features">
+        <div class="features-grid">
+            <div class="feature-item reveal">
+                <h3>🏦 US Regulatory Compliance</h3>
+                <p>Built strictly for US residents. EXNYA.US complies with all state and federal regulations, offering a secure, regulated environment for your digital assets.</p>
+            </div>
+            <div class="feature-item reveal">
+                <h3>🔒 Institutional Security</h3>
+                <p>We leverage advanced SOC 2 Type 2 certified protocols and strictly utilize cold storage for the majority of customer funds to ensure ultimate asset safety.</p>
+            </div>
+            <div class="feature-item reveal">
+                <h3>📈 Staking Rewards</h3>
+                <p>Earn passive income on your crypto. EXNYA.US offers competitive APY rates on top-tier proof-of-stake assets with flexible un-staking options.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="disclaimer">
+            <strong>Risk Warning:</strong> Trading cryptocurrencies involves significant risk and can result in the loss of your capital. You should not invest more than you can afford to lose and you should ensure that you fully understand the risks involved. Before trading, please take into consideration your level of experience, investment objectives, and seek independent financial advice if necessary. EXNYA.US is an independent entity tailored specifically for the United States market.
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2026 BAM Trading Services Inc. d.b.a EXNYA.US. All rights reserved.</span>
+            <span>Terms of Use | Privacy Policy | Licenses</span>
+        </div>
+    </footer>
+
+    <script>
+        // --- Theme Toggle Logic ---
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('themeBtn');
+            
+            body.classList.toggle('light-theme');
+            
+            if(body.classList.contains('light-theme')) {
+                btn.innerText = 'Dark Mode';
+            } else {
+                btn.innerText = 'Light Mode';
+            }
+        }
+
+        // 1. Scroll Reveal Animation
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('active');
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        });
+
+        // 2. Simple Widget Calculator
+        const spendInput = document.getElementById('spend-input');
+        const receiveInput = document.getElementById('receive-input');
+        let currentBtcPrice = 68450.20;
+
+        spendInput.addEventListener('input', (e) => {
+            let val = e.target.value.replace(/,/g, '');
+            if(!isNaN(val) && val > 0) {
+                receiveInput.value = (val / currentBtcPrice).toFixed(5);
+            } else {
+                receiveInput.value = '0.00';
+            }
+        });
+
+        // 3. Live Market Data Simulator
+        const coins = [
+            { id: 'btc', symbol: 'BTC', name: 'Bitcoin', price: 68450.20, change: 1.24, vol: '$1.8B', iconColor: '#F7931A' },
+            { id: 'eth', symbol: 'ETH', name: 'Ethereum', price: 3450.80, change: -0.45, vol: '$920M', iconColor: '#627EEA' },
+            { id: 'sol', symbol: 'SOL', name: 'Solana', price: 145.60, change: 4.30, vol: '$450M', iconColor: '#14F195' },
+            { id: 'usdt', symbol: 'USDT', name: 'Tether', price: 1.00, change: 0.01, vol: '$2.1B', iconColor: '#26A17B' },
+            { id: 'ada', symbol: 'ADA', name: 'Cardano', price: 0.58, change: -1.20, vol: '$120M', iconColor: '#0033AD' }
+        ];
+
+        const tbody = document.getElementById('market-body');
+
+        function renderTable() {
+            tbody.innerHTML = '';
+            coins.forEach(coin => {
+                const isUp = coin.change >= 0;
+                const changeClass = isUp ? 'price-up' : 'price-down';
+                const sign = isUp ? '+' : '';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div class="asset-col">
+                            <div class="asset-icon" style="background:${coin.iconColor}; display:flex; justify-content:center; align-items:center; color:#fff; font-weight:bold; font-size:12px;">${coin.symbol[0]}</div>
+                            <div>
+                                <span class="asset-symbol">${coin.symbol}</span>
+                                <span class="asset-name">${coin.name}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td id="price-${coin.id}">$${coin.price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td id="change-${coin.id}" class="${changeClass}">${sign}${coin.change.toFixed(2)}%</td>
+                    <td class="hide-mobile">${coin.vol}</td>
+                    <td style="text-align: right;"><a href="#" class="trade-link">Trade</a></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        renderTable();
+
+        // Simulate Live Price Ticker
+        setInterval(() => {
+            const idx = Math.floor(Math.random() * coins.length);
+            if (coins[idx].symbol === 'USDT') return; // Keep stablecoin stable
+            
+            const coin = coins[idx];
+            const oldPrice = coin.price;
+            
+            // Random fluctuation
+            const shift = 1 + ((Math.random() * 0.2 - 0.1) / 100);
+            coin.price = coin.price * shift;
+            coin.change = coin.change + (Math.random() * 0.1 - 0.05);
+            
+            if(coin.id === 'btc') currentBtcPrice = coin.price; // Update widget calculator
+
+            // Update DOM
+            const priceEl = document.getElementById(`price-${coin.id}`);
+            const changeEl = document.getElementById(`change-${coin.id}`);
+            
+            priceEl.innerText = `$${coin.price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            
+            const isUp = coin.change >= 0;
+            changeEl.innerText = `${isUp ? '+' : ''}${coin.change.toFixed(2)}%`;
+            changeEl.className = isUp ? 'price-up' : 'price-down';
+
+            // Flash Animation
+            const flashClass = coin.price > oldPrice ? 'flash-up' : 'flash-down';
+            priceEl.classList.remove('flash-up', 'flash-down');
+            void priceEl.offsetWidth; // Reflow
+            priceEl.classList.add(flashClass);
+
+        }, 2000);
+
+        // --- Canvas Particle Animation ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particlesArray = [];
+        let numParticles = 100;
+
+        // Resize canvas
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        setCanvasSize();
+        window.addEventListener('resize', setCanvasSize);
+
+        // Particle Object
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Bounce off edges
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                // Gold color with low opacity
+                ctx.fillStyle = 'rgba(212, 175, 55, 0.5)'; 
+                ctx.fill();
+            }
+        }
+
+        // Initialize and animate
+        function init() {
+            particlesArray = [];
+            for (let i = 0; i < numParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+                
+                // Draw connecting lines between close particles
+                for (let j = i; j < particlesArray.length; j++) {
+                    const dx = particlesArray[i].x - particlesArray[j].x;
+                    const dy = particlesArray[i].y - particlesArray[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 100) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(212, 175, 55, ${0.2 - distance/500})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
+                        ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+    </script>
+</body>
+</html>

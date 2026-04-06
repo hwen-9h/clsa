@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXNYA | Log In</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CSS Variables --- */
+        :root {
+            --bg-deep: #050505;
+            --gold-primary: #D4AF37;
+            --gold-hover: #b5952f;
+            --gold-gradient: linear-gradient(135deg, #F9E596 0%, #D4AF37 50%, #997A15 100%);
+            --text-main: #F4F4F4;
+            --text-muted: #A0A0A0;
+            --glass-bg: rgba(15, 15, 15, 0.65);
+            --glass-border: rgba(212, 175, 55, 0.25);
+            --input-bg: rgba(255, 255, 255, 0.03);
+            --input-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden; /* Prevent scrolling on login page */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- Canvas Background --- */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* --- Glassmorphism Login Container --- */
+        .login-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .login-box {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 50px 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.05);
+            text-align: center;
+        }
+
+        /* Subtle inner glow */
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.15), transparent 60%);
+            border-radius: 24px;
+            pointer-events: none;
+        }
+
+        .logo img{
+            font-family: 'Playfair Display', serif;
+            width: 32%;
+            letter-spacing: 4px;
+            background: var(--gold-gradient);
+            /* -webkit-background-clip: text; */
+            /* -webkit-text-fill-color: transparent; */
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 35px;
+        }
+
+        /* --- Form Elements --- */
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            padding: 16px;
+            color: var(--text-main);
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: var(--gold-primary);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+        }
+
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 13px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        /* Custom Checkbox */
+        .remember-me input[type="checkbox"] {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 1px solid var(--text-muted);
+            border-radius: 4px;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .remember-me input[type="checkbox"]:checked {
+            background: var(--gold-primary);
+            border-color: var(--gold-primary);
+        }
+
+        .remember-me input[type="checkbox"]:checked::after {
+            content: '✔';
+            position: absolute;
+            color: #000;
+            font-size: 10px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .forgot-pass {
+            color: var(--gold-primary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .forgot-pass:hover {
+            color: var(--text-main);
+        }
+
+        /* --- Buttons --- */
+        .btn-login {
+            width: 100%;
+            background: var(--gold-gradient);
+            color: #000;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .signup-link {
+            display: block;
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .signup-link a {
+            color: var(--gold-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .signup-link a:hover {
+            color: var(--text-main);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .login-box { padding: 40px 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="login-wrapper">
+        <div class="login-box">
+            <a href="./kdn.html"><div class="logo"><img src=".//WhatsApp Image 2026-04-03 at 4.24.59 AM.jpeg" alt=""></div></a>
+            <h2>Sign in to your account</h2>
+            
+            <form onsubmit="event.preventDefault(); alert('Authentication simulated. Welcome back!');">
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+
+                <div class="options">
+                    <label class="remember-me">
+                        <input type="checkbox"> Remember me
+                    </label>
+                    <a href="#" class="forgot-pass">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn-login">Log In</button>
+            </form>
+
+            <div class="signup-link">
+                Don't have an account? <a href="./xx .html">Create one</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particlesArray = [];
+        // Determine particle count based on screen width for performance
+        const numParticles = window.innerWidth < 768 ? 40 : 80; 
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        setCanvasSize();
+        window.addEventListener('resize', setCanvasSize);
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.5; 
+                this.speedX = (Math.random() * 0.5) - 0.25; 
+                this.speedY = (Math.random() * 0.5) - 0.25;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Wrap around edges for infinite flow
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = '#D4AF37';
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = '#D4AF37';
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            for (let i = 0; i < numParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+                
+                // Draw connecting lines
+                for (let j = i; j < particlesArray.length; j++) {
+                    const dx = particlesArray[i].x - particlesArray[j].x;
+                    const dy = particlesArray[i].y - particlesArray[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 130) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(212, 175, 55, ${0.15 - distance/866})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.shadowBlur = 0; // Keep lines crisp
+                        ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
+                        ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+    </script>
+</body>
+</html>
