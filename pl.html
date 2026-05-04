@@ -32,7 +32,7 @@
             background-color: var(--bg-deep);
             color: var(--text-main);
             height: 100vh;
-            overflow: hidden; /* Prevent scrolling on login page */
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -68,25 +68,24 @@
             padding: 50px 40px;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.05);
             text-align: center;
+            position: relative;
         }
 
-        /* Subtle inner glow */
         .login-box::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.15), transparent 60%);
             border-radius: 24px;
             pointer-events: none;
         }
 
-        .logo img{
+        .logo img {
             font-family: 'Playfair Display', serif;
             width: 32%;
-            letter-spacing: 4px;
-            background: var(--gold-gradient);
-            /* -webkit-background-clip: text; */
-            /* -webkit-text-fill-color: transparent; */
             margin-bottom: 10px;
         }
 
@@ -95,6 +94,13 @@
             font-weight: 500;
             color: var(--text-main);
             margin-bottom: 35px;
+        }
+
+        .error-message {
+            color: #f6465d;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
         }
 
         /* --- Form Elements --- */
@@ -235,28 +241,29 @@
     </style>
 </head>
 <body>
-
     <canvas id="particle-canvas"></canvas>
 
     <div class="login-wrapper">
         <div class="login-box">
-            <a href="./kdn.html"><div class="logo"><img src=".//WhatsApp Image 2026-04-03 at 4.24.59 AM.jpeg" alt=""></div></a>
+            <a href="./index.html"><div class="logo"><img src=".//WhatsApp Image 2026-04-03 at 4.24.59 AM.jpeg" alt="EXNYA"></div></a>
             <h2>Sign in to your account</h2>
             
-            <form onsubmit="event.preventDefault(); alert('Authentication simulated. Welcome back!');">
+            <div class="error-message" id="error-message">Invalid email or password</div>
+
+            <form id="login-form">
                 <div class="input-group">
                     <label for="email">Email Address</label>
-                    <input type="email" id="email" placeholder="Enter your email" required>
+                    <input type="email" id="email" placeholder="Enter your email" required autocomplete="email">
                 </div>
                 
                 <div class="input-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
                 </div>
 
                 <div class="options">
                     <label class="remember-me">
-                        <input type="checkbox"> Remember me
+                        <input type="checkbox" id="remember-me"> Remember me
                     </label>
                     <a href="#" class="forgot-pass">Forgot Password?</a>
                 </div>
@@ -271,11 +278,90 @@
     </div>
 
     <script>
+        // --- AUTO-REDIRECT IF ALREADY LOGGED IN ---
+        (function checkLoggedIn() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                window.location.href = './profile.html'; // Dashboard page
+            }
+        })();
+
+        // --- LOGIN LOGIC ---
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('remember-me').checked;
+            const errorDiv = document.getElementById('error-message');
+
+            // Hide error initially
+            errorDiv.style.display = 'none';
+
+            // Basic validation
+            if (!email || !password) {
+                showError('Please fill in all fields.');
+                return;
+            }
+
+            // Fetch stored users
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+
+            // Find user with matching credentials
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                // Store current user session (exclude password from session data)
+                const sessionData = {
+                    id: user.id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email,
+                    memberSince: user.memberSince || new Date().toLocaleDateString()
+                };
+
+                localStorage.setItem('currentUser', JSON.stringify(sessionData));
+
+                // If "Remember me" is checked, store email for next visit
+                if (rememberMe) {
+                    localStorage.setItem('rememberedEmail', email);
+                } else {
+                    localStorage.removeItem('rememberedEmail');
+                }
+
+                // Redirect to dashboard
+                window.location.href = './profile.html';
+            } else {
+                // Check if the email exists at all (to give a hint)
+                const emailExists = users.some(u => u.email === email);
+                if (!emailExists) {
+                    showError('No account found with this email. Please sign up.');
+                } else {
+                    showError('Invalid password. Please try again.');
+                }
+            }
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // Pre-fill email if "Remember me" was previously checked
+        (function prefillEmail() {
+            const remembered = localStorage.getItem('rememberedEmail');
+            if (remembered) {
+                document.getElementById('email').value = remembered;
+                document.getElementById('remember-me').checked = true;
+            }
+        })();
+
+        // --- PARTICLE BACKGROUND (unchanged) ---
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
 
         let particlesArray = [];
-        // Determine particle count based on screen width for performance
         const numParticles = window.innerWidth < 768 ? 40 : 80; 
 
         function setCanvasSize() {
@@ -298,7 +384,6 @@
                 this.x += this.speedX;
                 this.y += this.speedY;
 
-                // Wrap around edges for infinite flow
                 if (this.x < 0) this.x = canvas.width;
                 if (this.x > canvas.width) this.x = 0;
                 if (this.y < 0) this.y = canvas.height;
@@ -328,7 +413,6 @@
                 particlesArray[i].update();
                 particlesArray[i].draw();
                 
-                // Draw connecting lines
                 for (let j = i; j < particlesArray.length; j++) {
                     const dx = particlesArray[i].x - particlesArray[j].x;
                     const dy = particlesArray[i].y - particlesArray[j].y;
@@ -338,7 +422,7 @@
                         ctx.beginPath();
                         ctx.strokeStyle = `rgba(212, 175, 55, ${0.15 - distance/866})`;
                         ctx.lineWidth = 0.5;
-                        ctx.shadowBlur = 0; // Keep lines crisp
+                        ctx.shadowBlur = 0;
                         ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
                         ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
                         ctx.stroke();

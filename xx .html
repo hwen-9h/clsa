@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CSS Variables --- */
+        /* --- Default Theme (Dark & Gold) --- */
         :root {
             --bg-deep: #050505;
             --gold-primary: #D4AF37;
@@ -19,6 +19,26 @@
             --glass-border: rgba(212, 175, 55, 0.25);
             --input-bg: rgba(255, 255, 255, 0.03);
             --input-border: rgba(255, 255, 255, 0.1);
+            --btn-text-color: #000;
+            --box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+            --glow: rgba(212, 175, 55, 0.05);
+        }
+
+        /* --- Light Theme (White & Gold) --- */
+        body.light-theme {
+            --bg-deep: #f5f5f7;
+            --gold-primary: #b8860b;
+            --gold-hover: #8b6508;
+            --gold-gradient: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #b8860b 100%);
+            --text-main: #121212;
+            --text-muted: #4a4a4a;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(180, 140, 40, 0.35);
+            --input-bg: rgba(0, 0, 0, 0.02);
+            --input-border: rgba(0, 0, 0, 0.15);
+            --btn-text-color: #fff;
+            --box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            --glow: rgba(212, 175, 55, 0.15);
         }
 
         * {
@@ -36,12 +56,13 @@
             justify-content: center;
             align-items: center;
             overflow-x: hidden;
-            padding: 20px; /* Gives breathing room on smaller screens */
+            padding: 20px;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
 
         /* --- Canvas Background --- */
         #particle-canvas {
-            position: fixed; /* Fixed to keep background static if user needs to scroll */
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -50,53 +71,118 @@
             pointer-events: none;
         }
 
+        /* --- Theme Toggle Button (top right) --- */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            color: var(--gold-primary);
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .theme-toggle span {
+            font-size: 16px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--gold-primary);
+            color: #000;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
         /* --- Glassmorphism Signup Container --- */
         .signup-wrapper {
             position: relative;
             z-index: 2;
             width: 100%;
             max-width: 480px;
-            animation: fadeIn 1s ease-out;
+            animation: floatIn 0.8s ease-out;
+        }
+
+        @keyframes floatIn {
+            0% { opacity: 0; transform: translateY(40px) scale(0.96); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .signup-box {
             background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.05);
+            border-radius: 28px;
+            padding: 40px 35px;
+            box-shadow: var(--box-shadow), 0 0 50px var(--glow);
             text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-         .signup-box::before {
+        .signup-box::after {
             content: '';
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.15), transparent 60%);
-            border-radius: 24px;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(212,175,55,0.08), transparent 50%);
+            animation: shimmer 8s infinite linear;
             pointer-events: none;
         }
 
-        .logo img {
-            font-family: 'Playfair Display', serif;
-            width:  32%;
-            letter-spacing: 4px;
-            /* background: var(--gold-gradient); */
-            /* -webkit-background-clip: text; */
-            /* -webkit-text-fill-color: transparent; */
-            margin-bottom: 10px;
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
+
+        .logo {
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo a {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 45px;
+            width: auto;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Logo visibility based on theme */
+        .dark-logo { display: block; }
+        .light-logo { display: none; }
+
+        body.light-theme .dark-logo { display: none; }
+        body.light-theme .light-logo { display: block; }
 
         h2 {
-            font-size: 20px;
-            font-weight: 500;
+            font-size: 22px;
+            font-weight: 600;
             color: var(--text-main);
-            margin-bottom: 30px;
+            margin-bottom: 28px;
+            position: relative;
+            z-index: 2;
+            letter-spacing: -0.3px;
         }
 
-        
         .input-row {
             display: flex;
             gap: 15px;
@@ -104,17 +190,19 @@
 
         .input-group {
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             text-align: left;
             flex: 1;
+            z-index: 2;
         }
 
         .input-group label {
             display: block;
             font-size: 13px;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
         .input-group input {
@@ -122,18 +210,37 @@
             background: var(--input-bg);
             border: 1px solid var(--input-border);
             border-radius: 12px;
-            padding: 14px;
+            padding: 14px 16px;
             color: var(--text-main);
             font-size: 15px;
             outline: none;
             transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
         }
 
         .input-group input:focus {
             border-color: var(--gold-primary);
-            background: rgba(255, 255, 255, 0.05);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
         }
+
+        /* Password Strength Indicator */
+        .password-strength {
+            font-size: 12px;
+            margin-top: 6px;
+            text-align: left;
+            font-weight: 500;
+            display: none;
+        }
+
+        .strength-weak { color: #f6465d; }
+        .strength-medium { color: #f0b90b; }
+        .strength-strong { color: #0ecb81; }
 
         .terms {
             display: flex;
@@ -142,15 +249,18 @@
             color: var(--text-muted);
             font-size: 12px;
             text-align: left;
-            margin-bottom: 25px;
+            margin-bottom: 24px;
             cursor: pointer;
             line-height: 1.5;
+            z-index: 2;
+            position: relative;
         }
 
         .terms a {
             color: var(--gold-primary);
             text-decoration: none;
-            transition: color 0.3s;
+            font-weight: 600;
+            transition: color 0.2s;
         }
 
         .terms a:hover {
@@ -160,16 +270,16 @@
         /* Custom Checkbox */
         .terms input[type="checkbox"] {
             appearance: none;
-            min-width: 16px;
-            width: 16px;
-            height: 16px;
-            border: 1px solid var(--text-muted);
-            border-radius: 4px;
+            min-width: 18px;
+            width: 18px;
+            height: 18px;
+            border: 1px solid var(--gold-primary);
+            border-radius: 5px;
             background: transparent;
             cursor: pointer;
             position: relative;
             transition: all 0.2s;
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
         .terms input[type="checkbox"]:checked {
@@ -181,39 +291,61 @@
             content: '✔';
             position: absolute;
             color: #000;
-            font-size: 10px;
+            font-size: 11px;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            font-weight: bold;
         }
 
-        /* --- Buttons --- */
+        /* --- Submit Button --- */
         .btn-submit {
             width: 100%;
             background: var(--gold-gradient);
-            color: #000;
+            color: var(--btn-text-color);
             border: none;
             padding: 16px;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
             transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 50%;
+            height: 200%;
+            background: rgba(255,255,255,0.3);
+            transform: rotate(25deg);
+            transition: left 0.5s;
+        }
+
+        .btn-submit:hover::after {
+            left: 120%;
         }
 
         .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.5);
         }
 
         .login-link {
             display: block;
-            margin-top: 25px;
+            margin-top: 22px;
             font-size: 14px;
             color: var(--text-muted);
+            z-index: 2;
+            position: relative;
         }
 
         .login-link a {
@@ -227,28 +359,44 @@
             color: var(--text-main);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         @media (max-width: 480px) {
-            .signup-box { padding: 30px 20px; }
-            .input-row { flex-direction: column; gap: 0; }
+            .signup-box {
+                padding: 30px 20px;
+            }
+            .input-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                padding: 6px 12px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 <body>
-
     <canvas id="particle-canvas"></canvas>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
+        <span>☀️</span> Light Mode
+    </button>
 
     <div class="signup-wrapper">
         <div class="signup-box">
-            <div class="logo"><a href="./kdn.html"><img src=".//WhatsApp Image 2026-04-03 at 4.24.59 AM.jpeg" alt=""></a></div>
+            <div class="logo">
+                <a href="./index.html">
+                    <!-- Dark logo (visible by default) -->
+                    <img src=".//WhatsApp Image 2026-04-03 at 4.24.59 AM.jpeg" alt="EXNYA" class="dark-logo">
+                    <!-- Light logo (visible in light theme) -->
+                    <img src="./Gemini_Generated_Image_66zlk566zlk566zl.png" alt="EXNYA" class="light-logo">
+                </a>
+            </div>
             <h2>Create an account</h2>
             
-            <form onsubmit="event.preventDefault(); alert('Account created successfully! Welcome to EXNYA.');">
-                
+            <form id="signup-form">
                 <div class="input-row">
                     <div class="input-group">
                         <label for="firstName">First Name</label>
@@ -268,6 +416,7 @@
                 <div class="input-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" placeholder="Create a strong password" required>
+                    <div class="password-strength" id="password-strength"></div>
                 </div>
 
                 <div class="input-group">
@@ -276,7 +425,7 @@
                 </div>
 
                 <label class="terms">
-                    <input type="checkbox" required> 
+                    <input type="checkbox" id="terms-checkbox" required> 
                     <span>I certify that I am 18 years of age or older, and agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</span>
                 </label>
 
@@ -290,17 +439,40 @@
     </div>
 
     <script>
+        // --- Particle & Theme Toggle ---
+        let particleColorHex = '#D4AF37';
+        let particleR = 212, particleG = 175, particleB = 55;
+
+        function updateParticleColor() {
+            if (document.body.classList.contains('light-theme')) {
+                particleColorHex = '#000000';
+                particleR = 0; particleG = 0; particleB = 0;
+            } else {
+                particleColorHex = '#D4AF37';
+                particleR = 212; particleG = 175; particleB = 55;
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('themeBtn');
+            body.classList.toggle('light-theme');
+            btn.innerHTML = body.classList.contains('light-theme') 
+                ? '<span>🌙</span> Dark Mode' 
+                : '<span>☀️</span> Light Mode';
+            updateParticleColor();
+        }
+
+        // --- Canvas ---
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
-
         let particlesArray = [];
-        const numParticles = window.innerWidth < 768 ? 40 : 80; 
+        const numParticles = window.innerWidth < 768 ? 40 : 80;
 
         function setCanvasSize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
-        
         setCanvasSize();
         window.addEventListener('resize', setCanvasSize);
 
@@ -308,15 +480,13 @@
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 1.5 + 0.5; 
-                this.speedX = (Math.random() * 0.5) - 0.25; 
-                this.speedY = (Math.random() * 0.5) - 0.25;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() * 0.6) - 0.3;
+                this.speedY = (Math.random() * 0.6) - 0.3;
             }
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-
-                // Wrap around edges for infinite flow
                 if (this.x < 0) this.x = canvas.width;
                 if (this.x > canvas.width) this.x = 0;
                 if (this.y < 0) this.y = canvas.height;
@@ -325,38 +495,32 @@
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = '#D4AF37';
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = '#D4AF37';
+                ctx.fillStyle = particleColorHex;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = particleColorHex;
                 ctx.fill();
             }
         }
 
         function initParticles() {
             particlesArray = [];
-            for (let i = 0; i < numParticles; i++) {
-                particlesArray.push(new Particle());
-            }
+            for (let i = 0; i < numParticles; i++) particlesArray.push(new Particle());
         }
 
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
             for (let i = 0; i < particlesArray.length; i++) {
                 particlesArray[i].update();
                 particlesArray[i].draw();
-                
-                // Draw connecting lines
                 for (let j = i; j < particlesArray.length; j++) {
                     const dx = particlesArray[i].x - particlesArray[j].x;
                     const dy = particlesArray[i].y - particlesArray[j].y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < 130) {
+                    if (distance < 140) {
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(212, 175, 55, ${0.15 - distance/866})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.shadowBlur = 0; 
+                        ctx.strokeStyle = `rgba(${particleR}, ${particleG}, ${particleB}, ${0.18 - distance/800})`;
+                        ctx.lineWidth = 0.6;
+                        ctx.shadowBlur = 0;
                         ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
                         ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
                         ctx.stroke();
@@ -366,8 +530,108 @@
             requestAnimationFrame(animateParticles);
         }
 
+        updateParticleColor();
         initParticles();
         animateParticles();
+
+        // --- PASSWORD STRENGTH CHECKER ---
+        const passwordInput = document.getElementById('password');
+        const strengthDiv = document.getElementById('password-strength');
+
+        function checkPasswordStrength(password) {
+            let score = 0;
+            if (password.length >= 8) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[a-z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+
+            if (password.length === 0) {
+                return { text: '', class: '' };
+            } else if (score <= 2) {
+                return { text: 'Weak – use at least 8 characters, uppercase, lowercase, digit & symbol', class: 'strength-weak' };
+            } else if (score <= 4) {
+                return { text: 'Moderate – add more variety (uppercase, digit, symbol)', class: 'strength-medium' };
+            } else {
+                return { text: 'Strong password ✓', class: 'strength-strong' };
+            }
+        }
+
+        passwordInput.addEventListener('input', function() {
+            const pwd = passwordInput.value;
+            const result = checkPasswordStrength(pwd);
+            strengthDiv.textContent = result.text;
+            strengthDiv.className = 'password-strength ' + result.class;
+            strengthDiv.style.display = pwd.length > 0 ? 'block' : 'none';
+        });
+
+        // --- ACCOUNT CREATION (with strong password enforcement) ---
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const termsChecked = document.getElementById('terms-checkbox').checked;
+
+            if (!firstName || !lastName || !email || !password || !confirmPassword) {
+                alert('Please fill in all fields.');
+                return;
+            }
+            if (!termsChecked) {
+                alert('You must agree to the Terms of Service and Privacy Policy.');
+                return;
+            }
+            if (password !== confirmPassword) {
+                alert('Passwords do not match.');
+                return;
+            }
+
+            // Strong password validation
+            const strengthResult = checkPasswordStrength(password);
+            if (!strengthResult.text.includes('Strong')) {
+                alert('Your password is not strong enough. It must be at least 8 characters and include uppercase, lowercase, a digit, and a special character.');
+                return;
+            }
+
+            // Retrieve existing users
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            if (users.some(u => u.email === email)) {
+                alert('An account with this email already exists. Please log in instead.');
+                return;
+            }
+
+            const newUser = {
+                id: Date.now().toString(),
+                firstName,
+                lastName,
+                email,
+                password,
+                memberSince: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+            };
+
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            const sessionData = {
+                id: newUser.id,
+                firstName: newUser.firstName,
+                lastName: newUser.lastName,
+                email: newUser.email,
+                memberSince: newUser.memberSince
+            };
+            localStorage.setItem('currentUser', JSON.stringify(sessionData));
+
+            alert('Account created successfully! Welcome to EXNYA.');
+            window.location.href = './profile.html';
+        });
+
+        // --- Redirect if already logged in ---
+        if (localStorage.getItem('currentUser')) {
+            window.location.href = './profile.html';
+        }
     </script>
 </body>
 </html>

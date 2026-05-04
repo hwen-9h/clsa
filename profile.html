@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXNYA | My Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Core Theme (same as signup/login) --- */
+        :root {
+            --bg-base: #080b0f;
+            --bg-elevated: #12161c;
+            --bg-hover: #1e2530;
+            --brand-yellow: #fcd535;
+            --brand-yellow-hover: #f0b90b;
+            --text-primary: #eaecef;
+            --text-secondary: #848e9c;
+            --trade-green: #0ecb81;
+            --trade-red: #f6465d;
+            --border-light: #2b3139;
+            --nav-bg: rgba(8, 11, 15, 0.85);
+            --widget-bg: rgba(18, 22, 28, 0.7);
+            --card-shadow: 0 15px 30px rgba(0,0,0,0.4);
+            --font-mono: 'SF Mono', 'Fira Code', monospace;
+            --gold-gradient: linear-gradient(135deg, #F9E596 0%, #D4AF37 50%, #997A15 100%);
+        }
+
+        body.light-theme {
+            --bg-base: #f5f7fa;
+            --bg-elevated: #ffffff;
+            --bg-hover: #eef0f4;
+            --brand-yellow: #d4af37;
+            --brand-yellow-hover: #b8960f;
+            --text-primary: #1a1e25;
+            --text-secondary: #5a5f6b;
+            --border-light: #dce0e6;
+            --nav-bg: rgba(245, 247, 250, 0.9);
+            --widget-bg: rgba(255, 255, 255, 0.8);
+            --card-shadow: 0 15px 30px rgba(0,0,0,0.05);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            transition: background-color 0.4s, color 0.4s;
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+        }
+
+        /* Particle Canvas */
+        #particle-canvas {
+            position: fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none;
+        }
+
+        /* App Container */
+        .app-container {
+            position: relative; z-index:1;
+            display: flex; width:100%; min-height:100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: var(--bg-elevated);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 0;
+            transition: background 0.4s, border-color 0.4s;
+            flex-shrink: 0;
+        }
+        .sidebar-logo { padding: 0 24px 24px; border-bottom: 1px solid var(--border-light); }
+        .sidebar-logo img { height: 32px; }
+        .dark-logo { display:block; } .light-logo { display:none; }
+        body.light-theme .dark-logo { display:none; } body.light-theme .light-logo { display:block; }
+        .sidebar-nav { flex: 1; padding: 20px 12px; }
+        .sidebar-nav a {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; border-radius: 10px;
+            color: var(--text-secondary); text-decoration: none;
+            font-weight: 500; font-size: 14px;
+            transition: all 0.2s; margin-bottom: 4px;
+        }
+        .sidebar-nav a:hover, .sidebar-nav a.active { background: var(--bg-hover); color: var(--brand-yellow); }
+        .sidebar-footer { padding: 20px 24px; border-top: 1px solid var(--border-light); }
+
+        /* Main Content */
+        .main-content {
+            flex: 1; padding: 32px 40px;
+            overflow-y: auto;
+            background: var(--bg-base);
+            transition: background 0.4s;
+        }
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 32px; flex-wrap: wrap; gap: 16px;
+        }
+        .user-greeting { display: flex; align-items: center; gap: 16px; }
+        .avatar {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: var(--gold-gradient);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #12161c; font-size: 20px;
+            text-transform: uppercase;
+        }
+        .greeting-text h1 { font-size: 24px; font-weight: 700; }
+        .greeting-text p { color: var(--text-secondary); font-size: 14px; }
+        .top-actions { display: flex; align-items: center; gap: 16px; }
+        .theme-btn, .logout-btn {
+            background: transparent; border: 1px solid var(--border-light);
+            color: var(--text-secondary); padding: 6px 16px;
+            border-radius: 40px; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 6px;
+        }
+        .theme-btn { border-color: var(--brand-yellow); color: var(--brand-yellow); }
+        .theme-btn:hover { background: var(--brand-yellow); color: #12161c; }
+        .logout-btn:hover { border-color: var(--trade-red); color: var(--trade-red); }
+
+        /* Cards */
+        .profile-card {
+            background: var(--widget-bg);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
+            padding: 28px; margin-bottom: 24px;
+            box-shadow: var(--card-shadow);
+            transition: background 0.4s, border-color 0.4s;
+        }
+        .profile-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .profile-field {
+            background: var(--bg-base); border-radius: 12px; padding: 16px;
+            border: 1px solid var(--border-light);
+        }
+        .profile-field label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+        .profile-field span { font-weight: 600; }
+
+        .balance-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 0; border-bottom: 1px solid var(--border-light);
+        }
+        .balance-row:last-child { border-bottom: none; }
+        .balance-asset { display: flex; align-items: center; gap: 12px; }
+        .asset-icon-small {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: bold; font-size: 14px;
+        }
+        .live-clock { font-family: var(--font-mono); color: var(--brand-yellow); font-weight: 600; }
+
+        /* Activity Feed */
+        .activity-list { list-style: none; max-height: 240px; overflow-y: auto; }
+        .activity-list li {
+            padding: 12px 0; border-bottom: 1px solid var(--border-light);
+            display: flex; justify-content: space-between; align-items: center;
+            color: var(--text-secondary); font-size: 13px;
+        }
+        .activity-list li:last-child { border-bottom: none; }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { padding: 24px 20px; }
+            .profile-grid { grid-template-columns: 1fr; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <a href="./index.html">
+                    <img src=".//WhatsApp Image 2026-04-03 at 4.24.59 AM.jpeg" alt="EXNYA" class="dark-logo">
+                    <img src="./Gemini_Generated_Image_66zlk566zlk566zl.png" alt="EXNYA" class="light-logo">
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="active">📊 Overview</a>
+                <a href="#">💰 Assets</a>
+                <a href="#">📈 Activity</a>
+                <a href="#">🔒 Security</a>
+                <a href="#">⚙️ Settings</a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">
+                    <span>☀️</span> Light Mode
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="user-greeting">
+                    <div class="avatar" id="user-initials">--</div>
+                    <div class="greeting-text">
+                        <h1 id="welcome-message">Welcome</h1>
+                        <p id="user-email">--</p>
+                    </div>
+                </div>
+                <div class="top-actions">
+                    <div class="live-clock" id="live-clock">--</div>
+                    <button class="theme-btn" onclick="toggleTheme()">
+                        <span>☀️</span> Light Mode
+                    </button>
+                    <button class="logout-btn" onclick="logout()">🚪 Sign Out</button>
+                </div>
+            </div>
+
+            <!-- Account Details Card -->
+            <div class="profile-card">
+                <h2>👤 Account Details</h2>
+                <div class="profile-grid">
+                    <div class="profile-field">
+                        <label>Full Name</label>
+                        <span id="profile-name">--</span>
+                    </div>
+                    <div class="profile-field">
+                        <label>Email Address</label>
+                        <span id="profile-email">--</span>
+                    </div>
+                    <div class="profile-field">
+                        <label>Member Since</label>
+                        <span id="profile-member">--</span>
+                    </div>
+                    <div class="profile-field">
+                        <label>Account Status</label>
+                        <span style="color: var(--trade-green);">✅ Verified</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Portfolio Card -->
+            <div class="profile-card">
+                <h2>💼 Portfolio Overview</h2>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <div id="portfolio-total" style="font-size: 28px; font-weight: 700; font-family: var(--font-mono);">$0.00</div>
+                        <div id="portfolio-change" style="font-size: 14px; margin-top: 4px;">--</div>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 13px;">
+                        Updated <span id="last-update">--</span>
+                    </div>
+                </div>
+                <div style="margin-top: 16px;" id="balances-container"></div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="profile-card">
+                <h2>📈 Recent Activity</h2>
+                <ul class="activity-list" id="activity-feed"></ul>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- CHECK LOGIN STATUS ---
+        (function requireAuth() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                window.location.href = './pl.html';
+                return;
+            }
+            // Once we know user exists, set up the page
+            document.addEventListener('DOMContentLoaded', function() {
+                personalizeDashboard(currentUser);
+            });
+            // If DOM already ready, call now
+            if (document.readyState !== 'loading') {
+                personalizeDashboard(currentUser);
+            }
+        })();
+
+        function personalizeDashboard(user) {
+            // Set user details
+            const firstName = user.firstName || 'User';
+            const lastName = user.lastName || '';
+            const fullName = firstName + ' ' + lastName;
+            const initials = firstName.charAt(0).toUpperCase() + (lastName ? lastName.charAt(0).toUpperCase() : '');
+            
+            document.getElementById('user-initials').textContent = initials;
+            document.getElementById('welcome-message').textContent = `Welcome back, ${firstName}`;
+            document.getElementById('user-email').textContent = user.email;
+            document.getElementById('profile-name').textContent = fullName || '—';
+            document.getElementById('profile-email').textContent = user.email;
+            document.getElementById('profile-member').textContent = user.memberSince || '—';
+
+            // Generate / load portfolio for this user (using a deterministic seed from user id)
+            const portfolio = getUserPortfolio(user.id);
+            // Start live updates
+            startPortfolioSimulation(portfolio);
+            // Activity feed
+            initActivityFeed();
+            // Live clock
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        // --- PORTFOLIO (simulated per user) ---
+        function getUserPortfolio(userId) {
+            // Use a simple hash to create consistent initial holdings for the same user
+            const hash = simpleHash(userId);
+            // Prices from "markets" (same as before)
+            const prices = {
+                btc: 68500 + (hash % 2000),
+                eth: 3400 + (hash % 500),
+                sol: 145 + (hash % 20),
+                usdt: 1.0
+            };
+            // Holdings based on hash
+            const holdings = {
+                btc: 0.5 + ((hash % 10) / 10),       // 0.5 - 1.5
+                eth: 2.0 + ((hash % 20) / 10),        // 2.0 - 4.0
+                sol: 20  + ((hash % 30)),             // 20 - 50
+                usdt: 1000 + ((hash % 5000))          // 1000 - 6000
+            };
+            return { prices, holdings, previousTotal: 0 };
+        }
+
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = (hash << 5) - hash + str.charCodeAt(i);
+                hash |= 0; // convert to 32bit integer
+            }
+            return Math.abs(hash);
+        }
+
+        function startPortfolioSimulation(portfolio) {
+            window.portfolioData = portfolio; // store globally for updates
+
+            // Render initial
+            updatePortfolioUI();
+
+            // Simulate live market changes every 3 seconds
+            setInterval(() => {
+                for (let asset in portfolio.prices) {
+                    if (asset === 'usdt') continue;
+                    const shift = 1 + ((Math.random() * 0.4 - 0.2) / 100);
+                    portfolio.prices[asset] *= shift;
+                }
+                updatePortfolioUI();
+            }, 3000);
+        }
+
+        function updatePortfolioUI() {
+            const portfolio = window.portfolioData;
+            if (!portfolio) return;
+
+            const total = (portfolio.holdings.btc * portfolio.prices.btc) +
+                          (portfolio.holdings.eth * portfolio.prices.eth) +
+                          (portfolio.holdings.sol * portfolio.prices.sol) +
+                          portfolio.holdings.usdt;
+
+            document.getElementById('portfolio-total').textContent = 
+                `$${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            if (portfolio.previousTotal) {
+                const change = total - portfolio.previousTotal;
+                const changePercent = (change / portfolio.previousTotal) * 100;
+                const changeEl = document.getElementById('portfolio-change');
+                const isUp = change >= 0;
+                changeEl.innerHTML = `${isUp ? '+' : ''}$${Math.abs(change).toLocaleString('en-US', { minimumFractionDigits: 2 })} (${isUp ? '+' : ''}${changePercent.toFixed(2)}%)`;
+                changeEl.style.color = isUp ? 'var(--trade-green)' : 'var(--trade-red)';
+            }
+            portfolio.previousTotal = total;
+
+            // Update balance rows
+            const assets = [
+                { id: 'btc', name: 'Bitcoin', color: '#F7931A', qty: portfolio.holdings.btc },
+                { id: 'eth', name: 'Ethereum', color: '#627EEA', qty: portfolio.holdings.eth },
+                { id: 'sol', name: 'Solana', color: '#14F195', qty: portfolio.holdings.sol },
+                { id: 'usdt', name: 'Tether', color: '#26A17B', qty: portfolio.holdings.usdt }
+            ];
+
+            const container = document.getElementById('balances-container');
+            container.innerHTML = assets.map(a => {
+                const value = a.qty * portfolio.prices[a.id];
+                return `
+                <div class="balance-row">
+                    <div class="balance-asset">
+                        <div class="asset-icon-small" style="background:${a.color}">${a.name[0]}</div>
+                        <span>${a.name}</span>
+                    </div>
+                    <span><strong>${a.qty.toFixed(4)} ${a.id.toUpperCase()}</strong> · $${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>`;
+            }).join('');
+
+            document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+        }
+
+        // --- ACTIVITY FEED ---
+        function initActivityFeed() {
+            const feed = document.getElementById('activity-feed');
+            const activities = [
+                { type: 'Buy', asset: 'BTC', amount: '0.125', status: 'Completed', time: '10:45 AM' },
+                { type: 'Sell', asset: 'ETH', amount: '2.00', status: 'Completed', time: '09:12 AM' },
+                { type: 'Stake', asset: 'SOL', amount: '10.0', status: 'Pending', time: 'Yesterday' },
+                { type: 'Deposit', asset: 'USDT', amount: '500', status: 'Completed', time: '2 days ago' }
+            ];
+
+            feed.innerHTML = activities.map(a => `
+                <li>
+                    <span><strong>${a.type}</strong> ${a.amount} ${a.asset}</span>
+                    <span style="display:flex; gap:12px;">
+                        <span style="color: ${a.status === 'Completed' ? 'var(--trade-green)' : 'var(--text-secondary)'}">${a.status}</span>
+                        <span>${a.time}</span>
+                    </span>
+                </li>
+            `).join('');
+
+            // Simulate a new activity every 15 seconds
+            setInterval(() => {
+                const newAct = generateRandomActivity();
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span><strong>${newAct.type}</strong> ${newAct.amount} ${newAct.asset}</span>
+                    <span style="display:flex; gap:12px;">
+                        <span style="color: var(--trade-green)">${newAct.status}</span>
+                        <span>${newAct.time}</span>
+                    </span>
+                `;
+                feed.prepend(li);
+                if (feed.children.length > 6) feed.removeChild(feed.lastChild);
+            }, 15000);
+        }
+
+        function generateRandomActivity() {
+            const types = ['Buy', 'Sell', 'Stake', 'Withdraw', 'Deposit'];
+            const assets = ['BTC', 'ETH', 'SOL', 'USDT'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            const asset = assets[Math.floor(Math.random() * assets.length)];
+            const amount = (Math.random() * 2).toFixed(4);
+            const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            return { type, asset, amount, status: 'Completed', time };
+        }
+
+        // --- CLOCK ---
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('live-clock').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        // --- LOGOUT ---
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = './pl.html';
+        }
+
+        // --- THEME TOGGLE ---
+        let particleColorHex = '#D4AF37';
+        let particleR = 212, particleG = 175, particleB = 55;
+
+        function updateParticleColor() {
+            if (document.body.classList.contains('light-theme')) {
+                particleColorHex = '#000000';
+                particleR = 0; particleG = 0; particleB = 0;
+            } else {
+                particleColorHex = '#D4AF37';
+                particleR = 212; particleG = 175; particleB = 55;
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+            const btns = document.querySelectorAll('.theme-btn');
+            const mode = document.body.classList.contains('light-theme') ? 'Dark' : 'Light';
+            btns.forEach(btn => btn.innerHTML = `<span>${mode === 'Dark' ? '🌙' : '☀️'}</span> ${mode} Mode`);
+            updateParticleColor();
+        }
+
+        // --- PARTICLES (same as other pages) ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+        const numParticles = 80;
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        setCanvasSize();
+        window.addEventListener('resize', setCanvasSize);
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.8 + 0.4;
+                this.speedX = (Math.random() * 0.8) - 0.4;
+                this.speedY = (Math.random() * 0.8) - 0.4;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = particleColorHex;
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            for (let i = 0; i < numParticles; i++) particlesArray.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+                for (let j = i + 1; j < particlesArray.length; j++) {
+                    const dx = particlesArray[i].x - particlesArray[j].x;
+                    const dy = particlesArray[i].y - particlesArray[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 130) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(${particleR}, ${particleG}, ${particleB}, ${0.12 - distance / 1100})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
+                        ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        updateParticleColor();
+        initParticles();
+        animateParticles();
+    </script>
+</body>
+</html>

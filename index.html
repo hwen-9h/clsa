@@ -1,36 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EXNYA.US | The Premier US Crypto Exchange</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <title>EXNYA | The Global Crypto Exchange</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        /* --- Default Theme (Black & Gold) --- */
+        /* --- Default Theme (Dark & Gold) --- */
         :root {
-            --bg-base: #0B0E11;      
-            --bg-elevated: #181A20;  
-            --bg-hover: #2B3139;     
-            --brand-yellow: #FCD535; 
-            --brand-yellow-hover: #F0B90B;
-            --text-primary: #EAECEF;
-            --text-secondary: #848E9C;
-            --trade-green: #0ECB81;
-            --trade-red: #F6465D;
-            --border-light: #2B3139;
+            --bg-base: #080b0f;
+            --bg-elevated: #12161c;
+            --bg-hover: #1e2530;
+            --brand-yellow: #fcd535;
+            --brand-yellow-hover: #f0b90b;
+            --text-primary: #eaecef;
+            --text-secondary: #848e9c;
+            --trade-green: #0ecb81;
+            --trade-red: #f6465d;
+            --border-light: #2b3139;
+            --nav-bg: rgba(8, 11, 15, 0.8);
+            --widget-bg: rgba(18, 22, 28, 0.7);
+            --card-shadow: 0 25px 45px rgba(0, 0, 0, 0.5);
+            --glow: rgba(252, 213, 53, 0.08);
         }
 
         /* --- Light Theme (White & Gold) --- */
         body.light-theme {
-            --bg-base: #FFFFFF;      
-            --bg-elevated: #F8F9FA;  
-            --bg-hover: #EAECEF;     
-            --brand-yellow: #D4AF37; /* Slightly darker gold for better contrast on white */
-            --brand-yellow-hover: #b5952f;
-            --text-primary: #1E2329;
-            --text-secondary: #555555;
-            --border-light: #EAECEF;
+            --bg-base: #f5f7fa;
+            --bg-elevated: #ffffff;
+            --bg-hover: #eef0f4;
+            --brand-yellow: #d4af37;
+            --brand-yellow-hover: #b8960f;
+            --text-primary: #1a1e25;
+            --text-secondary: #5a5f6b;
+            --border-light: #dce0e6;
+            --nav-bg: rgba(245, 247, 250, 0.85);
+            --widget-bg: rgba(255, 255, 255, 0.7);
+            --card-shadow: 0 25px 45px rgba(0, 0, 0, 0.08);
+            --glow: rgba(180, 140, 40, 0.08);
         }
 
         * {
@@ -38,10 +47,8 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Inter', sans-serif;
-            -webkit-font-smoothing: antialiased;
         }
 
-        /* Added smooth transitions for background and color properties */
         body {
             background-color: var(--bg-base);
             color: var(--text-primary);
@@ -49,21 +56,48 @@
             line-height: 1.5;
             position: relative;
             transition: background-color 0.4s ease, color 0.4s ease;
+            -webkit-font-smoothing: antialiased;
         }
 
-        nav, .exchange-widget, .input-group, .feature-item, table td, table th, footer {
+        nav,
+        .exchange-widget,
+        .input-group,
+        .feature-item,
+        table td,
+        table th,
+        footer {
             transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
         }
 
-        /* --- Scroll Animation --- */
+        /* --- Smooth Scroll Reveal --- */
         .reveal {
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.6s ease-out;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
         }
+
         .reveal.active {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        /* --- Particle Canvas --- */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        #hero,
+        #markets,
+        #features,
+        footer {
+            position: relative;
+            z-index: 1;
         }
 
         /* --- Navigation --- */
@@ -71,67 +105,57 @@
             position: fixed;
             top: 0;
             width: 100%;
-            height: 64px;
-            padding: 0 24px;
+            height: 70px;
+            padding: 0 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: var(--bg-base);
+            background: var(--nav-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border-light);
             z-index: 1000;
+            transition: background 0.4s, border-color 0.4s;
         }
 
-        .nav-left, .nav-right {
+        .nav-left,
+        .nav-right {
             display: flex;
             align-items: center;
-            gap: 24px;
-        }
-        
-        .logo {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--brand-yellow);
-            letter-spacing: 0.5px;
-            margin-right: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 28px;
         }
 
         .logo a {
             display: flex;
             align-items: center;
+            text-decoration: none;
         }
 
         .logo img {
-            width: 15%;
-            height: 5%;
+            height: 38px;
+            width: auto;
+            transition: opacity 0.4s;
         }
 
-        /* --- Logo Theme Toggle Logic --- */
+        .dark-logo {
+            display: block;
+        }
+
         .light-logo {
             display: none;
-            width: 15%;
-            height: 5%;
         }
+
         body.light-theme .dark-logo {
             display: none;
         }
+
         body.light-theme .light-logo {
             display: block;
         }
-        
-        /* Diamond element mimicking the brand DNA */
-        .diamond-logo img {
-            width: 26px;
-            height: 26px;
-        }
 
-        .nav-links{
+        .nav-links {
             display: flex;
-            gap: 9%;
-            width: 90%;
+            gap: 32px;
             align-items: center;
         }
 
@@ -141,6 +165,24 @@
             font-size: 14px;
             font-weight: 500;
             transition: color 0.2s;
+            position: relative;
+            padding: 6px 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--brand-yellow);
+            transition: width 0.3s;
+            border-radius: 1px;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
         }
 
         .nav-links a:hover {
@@ -154,48 +196,64 @@
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
+            transition: color 0.2s, background 0.2s;
+            padding: 8px 16px;
+            border-radius: 8px;
         }
-        .btn-text:hover { color: var(--brand-yellow); }
+
+        .btn-text:hover {
+            color: var(--brand-yellow);
+            background: rgba(252, 213, 53, 0.08);
+        }
 
         .btn-primary {
-            background-color: var(--brand-yellow);
-            color: #1E2329;
+            background: linear-gradient(135deg, #f9e596 0%, var(--brand-yellow) 60%, #c99a1a 100%);
+            color: #12161c;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 10px 22px;
+            border-radius: 10px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.25s;
+            box-shadow: 0 8px 18px rgba(252, 213, 53, 0.3);
+            letter-spacing: 0.3px;
         }
-        .btn-primary:hover { background-color: var(--brand-yellow-hover); }
 
-        /* Theme Toggle Button */
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(252, 213, 53, 0.5);
+        }
+
         .theme-btn {
             background: transparent;
             border: 1px solid var(--brand-yellow);
             color: var(--brand-yellow);
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 6px 16px;
+            border-radius: 40px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
+
         .theme-btn:hover {
             background: var(--brand-yellow);
-            color: #1E2329;
+            color: #12161c;
         }
 
         /* --- Hero Section --- */
         #hero {
-            padding: 140px 24px 80px;
-            max-width: 1200px;
+            padding: 160px 32px 100px;
+            max-width: 1300px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 40px;
+            gap: 60px;
         }
 
         .hero-content {
@@ -204,76 +262,96 @@
         }
 
         .hero-tag {
-            display: inline-block;
-            background: rgba(252, 213, 53, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(252, 213, 53, 0.12);
             color: var(--brand-yellow);
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 12px;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 13px;
             font-weight: 600;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
             text-transform: uppercase;
+            letter-spacing: 0.4px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(252, 213, 53, 0.2);
         }
 
         .hero-title {
-            font-size: 56px;
-            font-weight: 600;
-            line-height: 1.1;
-            margin-bottom: 16px;
+            font-size: 58px;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, var(--text-primary) 20%, var(--brand-yellow) 90%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .hero-subtitle {
             font-size: 18px;
             color: var(--text-secondary);
-            margin-bottom: 40px;
+            margin-bottom: 36px;
             font-weight: 400;
+            max-width: 540px;
         }
 
-        /* US-Style Exchange Widget */
+        /* Exchange Widget - Glassmorphism */
         .exchange-widget {
-            background: var(--bg-elevated);
-            padding: 32px;
-            border-radius: 16px;
+            background: var(--widget-bg);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            padding: 36px 32px;
+            border-radius: 28px;
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid var(--border-light);
+            max-width: 420px;
+            box-shadow: var(--card-shadow), 0 0 80px var(--glow);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s;
+        }
+
+        .exchange-widget:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 35px 60px rgba(0, 0, 0, 0.6), 0 0 100px rgba(252, 213, 53, 0.15);
         }
 
         .widget-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 24px;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 28px;
         }
 
         .input-group {
-            background: var(--bg-base); 
+            background: var(--bg-base);
             border: 1px solid var(--border-light);
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 16px;
+            border-radius: 14px;
+            padding: 14px 20px;
+            margin-bottom: 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        
-        .input-group:hover {
-            border-color: var(--text-secondary);
+
+        .input-group:focus-within {
+            border-color: var(--brand-yellow);
+            box-shadow: 0 0 0 4px rgba(252, 213, 53, 0.15);
         }
 
         .input-label {
             font-size: 12px;
             color: var(--text-secondary);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            font-weight: 500;
         }
 
         .input-group input {
             background: transparent;
             border: none;
             color: var(--text-primary);
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 22px;
+            font-weight: 700;
             outline: none;
             width: 100%;
         }
@@ -281,195 +359,298 @@
         .currency-badge {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             background: var(--bg-elevated);
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 6px 14px;
+            border-radius: 30px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 15px;
             cursor: pointer;
+            border: 1px solid var(--border-light);
+            flex-shrink: 0;
         }
 
         .widget-btn {
             width: 100%;
-            padding: 16px;
-            font-size: 16px;
-            border-radius: 8px;
-            margin-top: 8px;
+            padding: 18px;
+            font-size: 18px;
+            border-radius: 14px;
+            margin-top: 12px;
+            font-weight: 700;
         }
 
-        /* --- Live Markets Table --- */
+        /* --- Markets Table --- */
         #markets {
-            max-width: 1200px;
-            margin: 0 auto 80px;
-            padding: 0 24px;
+            max-width: 1300px;
+            margin: 0 auto 100px;
+            padding: 0 32px;
         }
 
         .market-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .market-header h2 {
-            font-size: 28px;
-            font-weight: 600;
+            font-size: 32px;
+            font-weight: 700;
         }
 
         .market-header a {
-            color: var(--text-secondary);
             text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
+            color: #12161c;
+            background: var(--brand-yellow);
+            padding: 10px 24px;
+            border-radius: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
         }
-        .market-header a:hover { color: var(--brand-yellow); }
+
+        .market-header a:hover {
+            background: var(--brand-yellow-hover);
+            box-shadow: 0 8px 20px rgba(252, 213, 53, 0.3);
+        }
 
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0 10px;
         }
 
         th {
             text-align: left;
             color: var(--text-secondary);
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 500;
-            padding: 16px 8px;
-            border-bottom: 1px solid var(--border-light);
+            padding: 14px 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         td {
-            padding: 16px 8px;
+            background: var(--bg-elevated);
+            padding: 20px 16px;
+            border-top: 1px solid var(--border-light);
             border-bottom: 1px solid var(--border-light);
-            font-size: 15px;
+            transition: background 0.2s;
             font-weight: 500;
-            vertical-align: middle;
-            transition: background-color 0.2s;
+        }
+
+        tr td:first-child {
+            border-left: 1px solid var(--border-light);
+            border-top-left-radius: 14px;
+            border-bottom-left-radius: 14px;
+        }
+
+        tr td:last-child {
+            border-right: 1px solid var(--border-light);
+            border-top-right-radius: 14px;
+            border-bottom-right-radius: 14px;
         }
 
         tr:hover td {
-            background-color: var(--bg-hover);
+            background: var(--bg-hover);
             cursor: pointer;
         }
 
         .asset-col {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
 
         .asset-icon {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 13px;
+            flex-shrink: 0;
         }
 
-        .asset-symbol { font-weight: 600; color: var(--text-primary); }
-        .asset-name { font-size: 12px; color: var(--text-secondary); margin-left: 8px;}
-
-        .price-up { color: var(--trade-green); }
-        .price-down { color: var(--trade-red); }
-
-        /* Flashing Animation for Live Prices */
-        @keyframes flashUp { 0% { background-color: rgba(14, 203, 129, 0.15); } 100% { background-color: transparent; } }
-        @keyframes flashDown { 0% { background-color: rgba(246, 70, 93, 0.15); } 100% { background-color: transparent; } }
-        .flash-up { animation: flashUp 0.8s ease-out; color: var(--trade-green); }
-        .flash-down { animation: flashDown 0.8s ease-out; color: var(--trade-red); }
-
-        .trade-link {
-            color: var(--text-primary);
-            text-decoration: none;
-            font-weight: 600;
-            background: var(--bg-elevated);
-            padding: 6px 16px;
-            border-radius: 4px;
-            font-size: 14px;
-            transition: all 0.2s;
+        .price-up {
+            color: var(--trade-green);
         }
-        tr:hover .trade-link {
+
+        .price-down {
+            color: var(--trade-red);
+        }
+
+        .trade-btn {
             background: var(--brand-yellow);
-            color: #000;
+            color: #12161c;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
         }
 
-        /* --- US Compliance & Features --- */
+        .trade-btn:hover {
+            background: var(--brand-yellow-hover);
+            transform: scale(1.05);
+        }
+
+        /* Flash animations */
+        @keyframes flashUp {
+            0% {
+                background-color: rgba(14, 203, 129, 0.15);
+            }
+            100% {
+                background-color: transparent;
+            }
+        }
+
+        @keyframes flashDown {
+            0% {
+                background-color: rgba(246, 70, 93, 0.15);
+            }
+            100% {
+                background-color: transparent;
+            }
+        }
+
+        .flash-up {
+            animation: flashUp 0.9s ease-out;
+        }
+
+        .flash-down {
+            animation: flashDown 0.9s ease-out;
+        }
+
+        /* --- Features --- */
         #features {
             background-color: var(--bg-elevated);
-            padding: 80px 24px;
+            padding: 100px 32px;
         }
 
         .features-grid {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 0 auto;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 40px;
         }
 
+        .feature-item {
+            padding: 32px;
+            border-radius: 24px;
+            transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+            border: 1px solid transparent;
+            background: var(--bg-base);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-item:hover {
+            background: var(--bg-hover);
+            transform: translateY(-12px);
+            border: 1px solid var(--brand-yellow);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 40px var(--glow);
+        }
+
         .feature-item h3 {
-            font-size: 20px;
-            margin-bottom: 12px;
+            font-size: 22px;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
             gap: 12px;
-            color: var(--text-primary);
+            font-weight: 700;
         }
 
         .feature-item p {
             color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 15px;
+            line-height: 1.7;
         }
 
         /* --- Footer --- */
         footer {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 0 auto;
-            padding: 60px 24px;
+            padding: 50px 32px;
             color: var(--text-secondary);
-            font-size: 12px;
-            line-height: 1.8;
+            font-size: 13px;
             border-top: 1px solid var(--border-light);
+            background: transparent;
         }
 
         footer .disclaimer {
             margin-bottom: 24px;
+            line-height: 1.6;
         }
 
         .footer-bottom {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
-        @media (max-width: 900px) {
-            #hero { flex-direction: column; text-align: center; padding-top: 100px; }
-            .hero-content { align-items: center; display: flex; flex-direction: column; }
-            .nav-links { display: none; }
-            .features-grid { grid-template-columns: 1fr; }
-            .hide-mobile { display: none; }
-            #particle-canvas{display: none;}
+        @media (max-width: 1024px) {
+            .nav-links {
+                gap: 20px;
+            }
+            .hero-title {
+                font-size: 44px;
+            }
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
-        
-         #particle-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-            background-size: cover;
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 0 20px;
+            }
+            .nav-links {
+                display: none;
+            }
+            #hero {
+                flex-direction: column;
+                padding: 120px 20px 60px;
+                text-align: center;
+            }
+            .hero-content {
+                align-items: center;
+                display: flex;
+                flex-direction: column;
+            }
+            .hero-title {
+                font-size: 36px;
+            }
+            .exchange-widget {
+                max-width: 100%;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            th:nth-child(4),
+            td:nth-child(4) {
+                display: none;
+            }
+            .market-header a {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
         }
     </style>
-    
 </head>
+
 <body>
     <canvas id="particle-canvas"></canvas>
+
     <nav>
         <div class="nav-left">
             <div class="logo">
-                <a href="./kdn.html">
+                <a href="./index.html">
                     <img src=".//WhatsApp Image 2026-04-03 at 4.24.59 AM.jpeg" alt="EXNYA" class="dark-logo">
                     <img src="./Gemini_Generated_Image_66zlk566zlk566zl.png" alt="EXNYA" class="light-logo">
                 </a>
@@ -484,7 +665,9 @@
             </div>
         </div>
         <div class="nav-right">
-            <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">Light Mode</button>
+            <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">
+                <span>☀️</span> Light Mode
+            </button>
             <a href="./pl.html"><button class="btn-text">Log In</button></a>
             <a href="./xx .html"><button class="btn-primary">Sign Up</button></a>
         </div>
@@ -492,43 +675,38 @@
 
     <section id="hero">
         <div class="hero-content reveal">
-            <span class="hero-tag">Zero Fees on BTC Trading</span>
-            <h1 class="hero-title">Trade crypto in the US with confidence</h1>
-            <p class="hero-subtitle">Buy, sell, and stake over 150+ cryptocurrencies on America's premier compliant digital asset exchange. Industry-leading security with incredibly low fees.</p>
-            <button class="btn-primary" style="padding: 12px 24px; font-size: 16px;">Get Started</button>
+            <span class="hero-tag">🚀 BTC Trading — Zero Fees</span>
+            <h1 class="hero-title">Your Gateway to Global Crypto Markets</h1>
+            <p class="hero-subtitle">Trade with confidence on the world’s most intuitive exchange. Deep liquidity, institutional‑grade security, and zero‑fee BTC trading — your next move starts here.</p>
+            <a href="./xx .html"><button class="btn-primary" style="padding: 14px 32px; font-size: 18px;">Get Started</button></a>
         </div>
 
         <div class="exchange-widget reveal">
-            <div class="widget-title">Buy Crypto</div>
-            
+            <div class="widget-title">Instant Buy</div>
             <div class="input-group">
                 <div>
                     <div class="input-label">Spend</div>
                     <input type="text" value="1,000" id="spend-input">
                 </div>
-                <div class="currency-badge">
-                    🇺🇸 USD
-                </div>
+                <div class="currency-badge">🇺🇸 USD</div>
             </div>
-
             <div class="input-group">
                 <div>
                     <div class="input-label">Receive</div>
-                    <input type="text" value="0.0145" readonly id="receive-input">
+                    <input type="text" value="0.01460" readonly id="receive-input">
                 </div>
-                <div class="currency-badge" style="background: rgba(252, 213, 53, 0.2); color: var(--brand-yellow);">
+                <div class="currency-badge" style="background: rgba(252,213,53,0.2); color: var(--brand-yellow);">
                     ₿ BTC
                 </div>
             </div>
-
-            <button class="btn-primary widget-btn" onclick="alert('Redirecting to secure signup...')">Buy BTC</button>
+            <a href="./xx .html"><button class="btn-primary widget-btn">Buy BTC</button></a>
         </div>
     </section>
 
     <section id="markets" class="reveal">
         <div class="market-header">
-            <h2>Market Trend</h2>
-            <a href="#">View All Markets ></a>
+            <h2>Live Market</h2>
+            <a href="#">Explore All Markets →</a>
         </div>
         <table>
             <thead>
@@ -536,88 +714,102 @@
                     <th>Name</th>
                     <th>Price</th>
                     <th>24h Change</th>
-                    <th class="hide-mobile">24h Volume</th>
+                    <th>24h Volume</th>
                     <th style="text-align: right;">Action</th>
                 </tr>
             </thead>
-            <tbody id="market-body">
-                </tbody>
+            <tbody id="market-body"></tbody>
         </table>
     </section>
 
     <section id="features">
         <div class="features-grid">
             <div class="feature-item reveal">
-                <h3>🏦 US Regulatory Compliance</h3>
-                <p>Built strictly for US residents. EXNYA.US complies with all state and federal regulations, offering a secure, regulated environment for your digital assets.</p>
+                <h3>🌍 Global Compliance</h3>
+                <p>We navigate the regulatory landscape so you don't have to. Transparent, secure, and compliant trading for everyone.</p>
             </div>
             <div class="feature-item reveal">
-                <h3>🔒 Institutional Security</h3>
-                <p>We leverage advanced SOC 2 Type 2 certified protocols and strictly utilize cold storage for the majority of customer funds to ensure ultimate asset safety.</p>
+                <h3>🔒 Vault‑Level Security</h3>
+                <p>Assets shielded by top‑tier encryption and cold storage. Your digital wealth stays strictly in your control.</p>
             </div>
             <div class="feature-item reveal">
-                <h3>📈 Staking Rewards</h3>
-                <p>Earn passive income on your crypto. EXNYA.US offers competitive APY rates on top-tier proof-of-stake assets with flexible un-staking options.</p>
+                <h3>📈 Passive Income</h3>
+                <p>Stake your crypto and earn competitive APY with total flexibility. Your assets work while you sleep.</p>
             </div>
         </div>
     </section>
 
     <footer>
         <div class="disclaimer">
-            <strong>Risk Warning:</strong> Trading cryptocurrencies involves significant risk and can result in the loss of your capital. You should not invest more than you can afford to lose and you should ensure that you fully understand the risks involved. Before trading, please take into consideration your level of experience, investment objectives, and seek independent financial advice if necessary. EXNYA.US is an independent entity tailored specifically for the United States market.
+            <strong>Risk Warning:</strong> Trading cryptocurrencies involves significant risk and can result in the loss of your capital. Understand the risks before trading. EXNYA is a global digital asset exchange.
         </div>
         <div class="footer-bottom">
-            <span>&copy; 2026 BAM Trading Services Inc. d.b.a EXNYA.US. All rights reserved.</span>
-            <span>Terms of Use | Privacy Policy | Licenses</span>
+            <span>&copy; 2026 BAM Trading Services Inc. d.b.a EXNYA.</span>
+            <span>Terms of Service | Privacy Policy | Licenses</span>
         </div>
     </footer>
 
     <script>
-        // --- Theme Toggle Logic ---
-        function toggleTheme() {
-            const body = document.body;
-            const btn = document.getElementById('themeBtn');
-            
-            body.classList.toggle('light-theme');
-            
-            if(body.classList.contains('light-theme')) {
-                btn.innerText = 'Dark Mode';
+        // --- Theme & Particle Color Setup ---
+        let particleColorHex = '#d4af37';
+        let particleR = 212, particleG = 175, particleB = 55;
+
+        function updateParticleColor() {
+            if (document.body.classList.contains('light-theme')) {
+                particleColorHex = '#1a1e25';
+                particleR = 26;
+                particleG = 30;
+                particleB = 37;
             } else {
-                btn.innerText = 'Light Mode';
+                particleColorHex = '#d4af37';
+                particleR = 212;
+                particleG = 175;
+                particleB = 55;
             }
         }
 
-        // 1. Scroll Reveal Animation
-        document.addEventListener('DOMContentLoaded', () => {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) entry.target.classList.add('active');
-                });
-            }, { threshold: 0.1 });
-            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-        });
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('themeBtn');
+            body.classList.toggle('light-theme');
+            if (body.classList.contains('light-theme')) {
+                btn.innerHTML = '<span>🌙</span> Dark Mode';
+            } else {
+                btn.innerHTML = '<span>☀️</span> Light Mode';
+            }
+            updateParticleColor();
+        }
 
-        // 2. Simple Widget Calculator
+        // --- Scroll Reveal ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // --- Widget Calculator ---
         const spendInput = document.getElementById('spend-input');
         const receiveInput = document.getElementById('receive-input');
-        let currentBtcPrice = 68450.20;
+        let currentBtcPrice = 68500.00; // will be updated by live ticker
 
         spendInput.addEventListener('input', (e) => {
             let val = e.target.value.replace(/,/g, '');
-            if(!isNaN(val) && val > 0) {
-                receiveInput.value = (val / currentBtcPrice).toFixed(5);
+            if (!isNaN(val) && val > 0) {
+                receiveInput.value = (parseFloat(val) / currentBtcPrice).toFixed(5);
             } else {
-                receiveInput.value = '0.00';
+                receiveInput.value = '0.00000';
             }
         });
 
-        // 3. Live Market Data Simulator
+        // --- Live Market Data ---
         const coins = [
-            { id: 'btc', symbol: 'BTC', name: 'Bitcoin', price: 68450.20, change: 1.24, vol: '$1.8B', iconColor: '#F7931A' },
-            { id: 'eth', symbol: 'ETH', name: 'Ethereum', price: 3450.80, change: -0.45, vol: '$920M', iconColor: '#627EEA' },
-            { id: 'sol', symbol: 'SOL', name: 'Solana', price: 145.60, change: 4.30, vol: '$450M', iconColor: '#14F195' },
-            { id: 'usdt', symbol: 'USDT', name: 'Tether', price: 1.00, change: 0.01, vol: '$2.1B', iconColor: '#26A17B' },
-            { id: 'ada', symbol: 'ADA', name: 'Cardano', price: 0.58, change: -1.20, vol: '$120M', iconColor: '#0033AD' }
+            { id: 'btc', symbol: 'BTC', name: 'Bitcoin', price: 68500.00, change: 1.24, vol: '$1.9B', iconColor: '#F7931A' },
+            { id: 'eth', symbol: 'ETH', name: 'Ethereum', price: 3420.50, change: -0.37, vol: '$980M', iconColor: '#627EEA' },
+            { id: 'sol', symbol: 'SOL', name: 'Solana', price: 148.20, change: 3.88, vol: '$520M', iconColor: '#14F195' },
+            { id: 'usdt', symbol: 'USDT', name: 'Tether', price: 1.00, change: 0.01, vol: '$2.3B', iconColor: '#26A17B' },
+            { id: 'ada', symbol: 'ADA', name: 'Cardano', price: 0.62, change: -1.15, vol: '$140M', iconColor: '#0033AD' }
         ];
 
         const tbody = document.getElementById('market-body');
@@ -626,71 +818,64 @@
             tbody.innerHTML = '';
             coins.forEach(coin => {
                 const isUp = coin.change >= 0;
-                const changeClass = isUp ? 'price-up' : 'price-down';
-                const sign = isUp ? '+' : '';
-                
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>
                         <div class="asset-col">
-                            <div class="asset-icon" style="background:${coin.iconColor}; display:flex; justify-content:center; align-items:center; color:#fff; font-weight:bold; font-size:12px;">${coin.symbol[0]}</div>
+                            <div class="asset-icon" style="background:${coin.iconColor}">${coin.symbol[0]}</div>
                             <div>
-                                <span class="asset-symbol">${coin.symbol}</span>
-                                <span class="asset-name">${coin.name}</span>
+                                <span style="font-weight:700;">${coin.symbol}</span>
+                                <span style="color:var(--text-secondary); font-size:13px; margin-left:6px;">${coin.name}</span>
                             </div>
                         </div>
                     </td>
-                    <td id="price-${coin.id}">$${coin.price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                    <td id="change-${coin.id}" class="${changeClass}">${sign}${coin.change.toFixed(2)}%</td>
-                    <td class="hide-mobile">${coin.vol}</td>
-                    <td style="text-align: right;"><a href="#" class="trade-link">Trade</a></td>
+                    <td id="price-${coin.id}">$${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                    <td id="change-${coin.id}" class="${isUp ? 'price-up' : 'price-down'}">${isUp ? '+' : ''}${coin.change.toFixed(2)}%</td>
+                    <td>${coin.vol}</td>
+                    <td style="text-align: right;"><button class="trade-btn">Trade</button></td>
                 `;
                 tbody.appendChild(row);
             });
         }
+
         renderTable();
 
-        // Simulate Live Price Ticker
+        // --- Live Price Ticker with Flash ---
         setInterval(() => {
             const idx = Math.floor(Math.random() * coins.length);
-            if (coins[idx].symbol === 'USDT') return; // Keep stablecoin stable
-            
+            if (coins[idx].symbol === 'USDT') return;
+
             const coin = coins[idx];
             const oldPrice = coin.price;
-            
-            // Random fluctuation
-            const shift = 1 + ((Math.random() * 0.2 - 0.1) / 100);
-            coin.price = coin.price * shift;
-            coin.change = coin.change + (Math.random() * 0.1 - 0.05);
-            
-            if(coin.id === 'btc') currentBtcPrice = coin.price; // Update widget calculator
 
-            // Update DOM
+            const fluctuation = 1 + ((Math.random() * 0.25 - 0.1) / 100);
+            coin.price = coin.price * fluctuation;
+            coin.change = coin.change + (Math.random() * 0.12 - 0.06);
+
+            if (coin.id === 'btc') currentBtcPrice = coin.price;
+
             const priceEl = document.getElementById(`price-${coin.id}`);
             const changeEl = document.getElementById(`change-${coin.id}`);
-            
-            priceEl.innerText = `$${coin.price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            
+            if (!priceEl || !changeEl) return;
+
             const isUp = coin.change >= 0;
+            priceEl.innerText = `$${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
             changeEl.innerText = `${isUp ? '+' : ''}${coin.change.toFixed(2)}%`;
             changeEl.className = isUp ? 'price-up' : 'price-down';
 
-            // Flash Animation
+            // Flash effect
             const flashClass = coin.price > oldPrice ? 'flash-up' : 'flash-down';
             priceEl.classList.remove('flash-up', 'flash-down');
-            void priceEl.offsetWidth; // Reflow
+            void priceEl.offsetWidth;
             priceEl.classList.add(flashClass);
+        }, 2200);
 
-        }, 2000);
-
-        // --- Canvas Particle Animation ---
+        // --- Particle Animation ---
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
-
         let particlesArray = [];
-        let numParticles = 100;
+        const numParticles = 90;
 
-        // Resize canvas
         function setCanvasSize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -698,55 +883,50 @@
         setCanvasSize();
         window.addEventListener('resize', setCanvasSize);
 
-        // Particle Object
         class Particle {
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5;
-                this.speedX = Math.random() * 1 - 0.5;
-                this.speedY = Math.random() * 1 - 0.5;
+                this.size = Math.random() * 1.8 + 0.4;
+                this.speedX = (Math.random() * 0.8) - 0.4;
+                this.speedY = (Math.random() * 0.8) - 0.4;
             }
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-
-                // Bounce off edges
-                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
             }
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                // Gold color with low opacity
-                ctx.fillStyle = 'rgba(212, 175, 55, 0.5)'; 
+                ctx.fillStyle = particleColorHex;
                 ctx.fill();
             }
         }
 
-        // Initialize and animate
-        function init() {
+        function initParticles() {
             particlesArray = [];
             for (let i = 0; i < numParticles; i++) {
                 particlesArray.push(new Particle());
             }
         }
 
-        function animate() {
+        function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (let i = 0; i < particlesArray.length; i++) {
                 particlesArray[i].update();
                 particlesArray[i].draw();
-                
-                // Draw connecting lines between close particles
-                for (let j = i; j < particlesArray.length; j++) {
+                // Connect nearby particles
+                for (let j = i + 1; j < particlesArray.length; j++) {
                     const dx = particlesArray[i].x - particlesArray[j].x;
                     const dy = particlesArray[i].y - particlesArray[j].y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < 100) {
+                    if (distance < 130) {
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(212, 175, 55, ${0.2 - distance/500})`;
+                        ctx.strokeStyle = `rgba(${particleR}, ${particleG}, ${particleB}, ${0.12 - distance / 1100})`;
                         ctx.lineWidth = 0.5;
                         ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
                         ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
@@ -754,11 +934,12 @@
                     }
                 }
             }
-            requestAnimationFrame(animate);
+            requestAnimationFrame(animateParticles);
         }
 
-        init();
-        animate();
+        updateParticleColor();
+        initParticles();
+        animateParticles();
     </script>
 </body>
 </html>
