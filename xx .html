@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EXNYA | Create Account</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
-        /* --- Default Theme (Dark & Gold) --- */
         :root {
             --bg-deep: #050505;
             --gold-primary: #D4AF37;
-            --gold-hover: #b5952f;
             --gold-gradient: linear-gradient(135deg, #F9E596 0%, #D4AF37 50%, #997A15 100%);
             --text-main: #F4F4F4;
             --text-muted: #A0A0A0;
@@ -24,11 +26,9 @@
             --glow: rgba(212, 175, 55, 0.05);
         }
 
-        /* --- Light Theme (White & Gold) --- */
         body.light-theme {
             --bg-deep: #f5f5f7;
             --gold-primary: #b8860b;
-            --gold-hover: #8b6508;
             --gold-gradient: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #b8860b 100%);
             --text-main: #121212;
             --text-muted: #4a4a4a;
@@ -49,18 +49,16 @@
         }
 
         body {
-            background-color: var(--bg-deep);
+            background: var(--bg-deep);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-x: hidden;
             padding: 20px;
-            transition: background-color 0.4s ease, color 0.4s ease;
+            transition: background-color 0.4s, color 0.4s;
         }
 
-        /* --- Canvas Background --- */
         #particle-canvas {
             position: fixed;
             top: 0;
@@ -71,7 +69,6 @@
             pointer-events: none;
         }
 
-        /* --- Theme Toggle Button (top right) --- */
         .theme-toggle {
             position: fixed;
             top: 20px;
@@ -86,24 +83,17 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: 0.3s;
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .theme-toggle span {
-            font-size: 16px;
         }
 
         .theme-toggle:hover {
             background: var(--gold-primary);
             color: #000;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
         }
 
-        /* --- Glassmorphism Signup Container --- */
         .signup-wrapper {
             position: relative;
             z-index: 2;
@@ -113,20 +103,25 @@
         }
 
         @keyframes floatIn {
-            0% { opacity: 0; transform: translateY(40px) scale(0.96); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
+            0% {
+                opacity: 0;
+                transform: translateY(40px) scale(0.96);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .signup-box {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 28px;
             padding: 40px 35px;
             box-shadow: var(--box-shadow), 0 0 50px var(--glow);
             text-align: center;
-            transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
         }
@@ -138,14 +133,19 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 30% 30%, rgba(212,175,55,0.08), transparent 50%);
+            background: radial-gradient(circle at 30% 30%, rgba(212, 175, 55, 0.08), transparent 50%);
             animation: shimmer 8s infinite linear;
             pointer-events: none;
         }
 
         @keyframes shimmer {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg)
+            }
+
+            100% {
+                transform: rotate(360deg)
+            }
         }
 
         .logo {
@@ -154,24 +154,26 @@
             z-index: 2;
         }
 
-        .logo a {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-        }
-
         .logo img {
             height: 45px;
             width: auto;
-            transition: opacity 0.3s ease;
         }
 
-        /* Logo visibility based on theme */
-        .dark-logo { display: block; }
-        .light-logo { display: none; }
+        .dark-logo {
+            display: block;
+        }
 
-        body.light-theme .dark-logo { display: none; }
-        body.light-theme .light-logo { display: block; }
+        .light-logo {
+            display: none;
+        }
+
+        body.light-theme .dark-logo {
+            display: none;
+        }
+
+        body.light-theme .light-logo {
+            display: block;
+        }
 
         h2 {
             font-size: 22px;
@@ -180,7 +182,6 @@
             margin-bottom: 28px;
             position: relative;
             z-index: 2;
-            letter-spacing: -0.3px;
         }
 
         .input-row {
@@ -201,8 +202,6 @@
             font-size: 13px;
             color: var(--text-muted);
             margin-bottom: 6px;
-            font-weight: 500;
-            letter-spacing: 0.3px;
         }
 
         .input-group input {
@@ -214,33 +213,32 @@
             color: var(--text-main);
             font-size: 15px;
             outline: none;
-            transition: all 0.3s ease;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .input-group input::placeholder {
-            color: var(--text-muted);
-            opacity: 0.7;
+            transition: all 0.3s;
         }
 
         .input-group input:focus {
             border-color: var(--gold-primary);
-            background: rgba(255, 255, 255, 0.06);
             box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
         }
 
-        /* Password Strength Indicator */
         .password-strength {
             font-size: 12px;
             margin-top: 6px;
             text-align: left;
-            font-weight: 500;
             display: none;
         }
 
-        .strength-weak { color: #f6465d; }
-        .strength-medium { color: #f0b90b; }
-        .strength-strong { color: #0ecb81; }
+        .strength-weak {
+            color: #f6465d;
+        }
+
+        .strength-medium {
+            color: #f0b90b;
+        }
+
+        .strength-strong {
+            color: #0ecb81;
+        }
 
         .terms {
             display: flex;
@@ -256,18 +254,6 @@
             position: relative;
         }
 
-        .terms a {
-            color: var(--gold-primary);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s;
-        }
-
-        .terms a:hover {
-            color: var(--text-main);
-        }
-
-        /* Custom Checkbox */
         .terms input[type="checkbox"] {
             appearance: none;
             min-width: 18px;
@@ -278,13 +264,11 @@
             background: transparent;
             cursor: pointer;
             position: relative;
-            transition: all 0.2s;
             margin-top: 1px;
         }
 
         .terms input[type="checkbox"]:checked {
             background: var(--gold-primary);
-            border-color: var(--gold-primary);
         }
 
         .terms input[type="checkbox"]:checked::after {
@@ -298,7 +282,6 @@
             font-weight: bold;
         }
 
-        /* --- Submit Button --- */
         .btn-submit {
             width: 100%;
             background: var(--gold-gradient);
@@ -312,26 +295,10 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             position: relative;
             z-index: 2;
             overflow: hidden;
-        }
-
-        .btn-submit::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -60%;
-            width: 50%;
-            height: 200%;
-            background: rgba(255,255,255,0.3);
-            transform: rotate(25deg);
-            transition: left 0.5s;
-        }
-
-        .btn-submit:hover::after {
-            left: 120%;
         }
 
         .btn-submit:hover {
@@ -352,21 +319,18 @@
             color: var(--gold-primary);
             text-decoration: none;
             font-weight: 600;
-            transition: color 0.3s;
         }
 
-        .login-link a:hover {
-            color: var(--text-main);
-        }
-
-        @media (max-width: 480px) {
+        @media (max-width:480px) {
             .signup-box {
                 padding: 30px 20px;
             }
+
             .input-row {
                 flex-direction: column;
                 gap: 0;
             }
+
             .theme-toggle {
                 top: 10px;
                 right: 10px;
@@ -376,168 +340,84 @@
         }
     </style>
 </head>
+
 <body>
     <canvas id="particle-canvas"></canvas>
-
-    <!-- Theme Toggle Button -->
-    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
-        <span>☀️</span> Light Mode
-    </button>
-
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn"><span>☀️</span> Light Mode</button>
     <div class="signup-wrapper">
         <div class="signup-box">
             <div class="logo">
                 <a href="./index.html">
-                    <!-- Dark logo (visible by default) -->
                     <img src=".//WhatsApp Image 2026-04-03 at 4.24.59 AM.jpeg" alt="EXNYA" class="dark-logo">
-                    <!-- Light logo (visible in light theme) -->
                     <img src="./Gemini_Generated_Image_66zlk566zlk566zl.png" alt="EXNYA" class="light-logo">
                 </a>
             </div>
             <h2>Create an account</h2>
-            
             <form id="signup-form">
                 <div class="input-row">
-                    <div class="input-group">
-                        <label for="firstName">First Name</label>
-                        <input type="text" id="firstName" placeholder="First Name" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="lastName">Last Name</label>
-                        <input type="text" id="lastName" placeholder="Last Name" required>
-                    </div>
+                    <div class="input-group"><label for="firstName">First Name</label><input type="text" id="firstName"
+                            placeholder="First Name" required></div>
+                    <div class="input-group"><label for="lastName">Last Name</label><input type="text" id="lastName"
+                            placeholder="Last Name" required></div>
                 </div>
-
-                <div class="input-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" placeholder="Enter your email" required>
-                </div>
-                
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Create a strong password" required>
+                <div class="input-group"><label for="email">Email Address</label><input type="email" id="email"
+                        placeholder="Enter your email" required></div>
+                <div class="input-group"><label for="password">Password</label><input type="password" id="password"
+                        placeholder="Create a strong password" required>
                     <div class="password-strength" id="password-strength"></div>
                 </div>
-
-                <div class="input-group">
-                    <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
-                </div>
-
-                <label class="terms">
-                    <input type="checkbox" id="terms-checkbox" required> 
-                    <span>I certify that I am 18 years of age or older, and agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</span>
-                </label>
-
+                <div class="input-group"><label for="confirmPassword">Confirm Password</label><input type="password"
+                        id="confirmPassword" placeholder="Confirm your password" required></div>
+                <label class="terms"><input type="checkbox" id="terms-checkbox" required> <span>I agree to the <a
+                            href="#">Terms</a> and <a href="#">Privacy Policy</a></span></label>
                 <button type="submit" class="btn-submit">Sign Up</button>
             </form>
-
-            <div class="login-link">
-                Already have an account? <a href="./pl.html">Log in</a>
-            </div>
+            <div class="login-link">Already have an account? <a href="./pl.html">Log in</a></div>
         </div>
     </div>
 
     <script>
-        // --- Particle & Theme Toggle ---
-        let particleColorHex = '#D4AF37';
-        let particleR = 212, particleG = 175, particleB = 55;
+        const SUPABASE_URL = 'https://clwgengvcdokdzubdfxd.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsd2dlbmd2Y2Rva2R6dWJkZnhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTIxNjEsImV4cCI6MjA5MzQ4ODE2MX0.0zgizWWXLIHiKdNUAJ3yKaIaxEKsHoFeEIo8IUAMtHU';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Particles & Theme Toggle (unchanged)
+        let particleColorHex = '#D4AF37', particleR = 212, particleG = 175, particleB = 55;
         function updateParticleColor() {
             if (document.body.classList.contains('light-theme')) {
-                particleColorHex = '#000000';
-                particleR = 0; particleG = 0; particleB = 0;
+                particleColorHex = '#000000'; particleR = 0; particleG = 0; particleB = 0;
             } else {
-                particleColorHex = '#D4AF37';
-                particleR = 212; particleG = 175; particleB = 55;
+                particleColorHex = '#D4AF37'; particleR = 212; particleG = 175; particleB = 55;
             }
         }
-
         function toggleTheme() {
-            const body = document.body;
-            const btn = document.getElementById('themeBtn');
+            const body = document.body, btn = document.getElementById('themeBtn');
             body.classList.toggle('light-theme');
-            btn.innerHTML = body.classList.contains('light-theme') 
-                ? '<span>🌙</span> Dark Mode' 
-                : '<span>☀️</span> Light Mode';
+            btn.innerHTML = body.classList.contains('light-theme') ? '<span>🌙</span> Dark Mode' : '<span>☀️</span> Light Mode';
             updateParticleColor();
         }
-
-        // --- Canvas ---
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         let particlesArray = [];
         const numParticles = window.innerWidth < 768 ? 40 : 80;
-
-        function setCanvasSize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        setCanvasSize();
-        window.addEventListener('resize', setCanvasSize);
-
+        function setCanvasSize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        setCanvasSize(); window.addEventListener('resize', setCanvasSize);
         class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5;
-                this.speedX = (Math.random() * 0.6) - 0.3;
-                this.speedY = (Math.random() * 0.6) - 0.3;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.y < 0) this.y = canvas.height;
-                if (this.y > canvas.height) this.y = 0;
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = particleColorHex;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = particleColorHex;
-                ctx.fill();
-            }
+            constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 2 + 0.5; this.speedX = (Math.random() * 0.6) - 0.3; this.speedY = (Math.random() * 0.6) - 0.3; }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0) this.x = canvas.width; if (this.x > canvas.width) this.x = 0; if (this.y < 0) this.y = canvas.height; if (this.y > canvas.height) this.y = 0; }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = particleColorHex; ctx.shadowBlur = 10; ctx.shadowColor = particleColorHex; ctx.fill(); }
         }
-
-        function initParticles() {
-            particlesArray = [];
-            for (let i = 0; i < numParticles; i++) particlesArray.push(new Particle());
-        }
-
+        function initParticles() { particlesArray = []; for (let i = 0; i < numParticles; i++) particlesArray.push(new Particle()); }
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update();
-                particlesArray[i].draw();
-                for (let j = i; j < particlesArray.length; j++) {
-                    const dx = particlesArray[i].x - particlesArray[j].x;
-                    const dy = particlesArray[i].y - particlesArray[j].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < 140) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(${particleR}, ${particleG}, ${particleB}, ${0.18 - distance/800})`;
-                        ctx.lineWidth = 0.6;
-                        ctx.shadowBlur = 0;
-                        ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
-                        ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
-                        ctx.stroke();
-                    }
-                }
-            }
+            for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); for (let j = i + 1; j < particlesArray.length; j++) { const dx = particlesArray[i].x - particlesArray[j].x; const dy = particlesArray[i].y - particlesArray[j].y; const distance = Math.sqrt(dx * dx + dy * dy); if (distance < 140) { ctx.beginPath(); ctx.strokeStyle = `rgba(${particleR},${particleG},${particleB},${0.18 - distance / 800})`; ctx.lineWidth = 0.6; ctx.moveTo(particlesArray[i].x, particlesArray[i].y); ctx.lineTo(particlesArray[j].x, particlesArray[j].y); ctx.stroke(); } } }
             requestAnimationFrame(animateParticles);
         }
+        updateParticleColor(); initParticles(); animateParticles();
 
-        updateParticleColor();
-        initParticles();
-        animateParticles();
-
-        // --- PASSWORD STRENGTH CHECKER ---
+        // Password strength checker
         const passwordInput = document.getElementById('password');
         const strengthDiv = document.getElementById('password-strength');
-
         function checkPasswordStrength(password) {
             let score = 0;
             if (password.length >= 8) score++;
@@ -545,30 +425,21 @@
             if (/[a-z]/.test(password)) score++;
             if (/[0-9]/.test(password)) score++;
             if (/[^A-Za-z0-9]/.test(password)) score++;
-
-            if (password.length === 0) {
-                return { text: '', class: '' };
-            } else if (score <= 2) {
-                return { text: 'Weak – use at least 8 characters, uppercase, lowercase, digit & symbol', class: 'strength-weak' };
-            } else if (score <= 4) {
-                return { text: 'Moderate – add more variety (uppercase, digit, symbol)', class: 'strength-medium' };
-            } else {
-                return { text: 'Strong password ✓', class: 'strength-strong' };
-            }
+            if (password.length === 0) return { text: '', class: '' };
+            if (score <= 2) return { text: 'Weak – use 8 characters, uppercase, lowercase, digit & symbol', class: 'strength-weak' };
+            if (score <= 4) return { text: 'Moderate – add more variety', class: 'strength-medium' };
+            return { text: 'Strong password ✓', class: 'strength-strong' };
         }
-
-        passwordInput.addEventListener('input', function() {
-            const pwd = passwordInput.value;
-            const result = checkPasswordStrength(pwd);
+        passwordInput.addEventListener('input', function () {
+            const result = checkPasswordStrength(passwordInput.value);
             strengthDiv.textContent = result.text;
             strengthDiv.className = 'password-strength ' + result.class;
-            strengthDiv.style.display = pwd.length > 0 ? 'block' : 'none';
+            strengthDiv.style.display = passwordInput.value.length > 0 ? 'block' : 'none';
         });
 
-        // --- ACCOUNT CREATION (with strong password enforcement) ---
-        document.getElementById('signup-form').addEventListener('submit', function(e) {
+        // Signup
+        document.getElementById('signup-form').addEventListener('submit', async function (e) {
             e.preventDefault();
-
             const firstName = document.getElementById('firstName').value.trim();
             const lastName = document.getElementById('lastName').value.trim();
             const email = document.getElementById('email').value.trim().toLowerCase();
@@ -576,62 +447,37 @@
             const confirmPassword = document.getElementById('confirmPassword').value;
             const termsChecked = document.getElementById('terms-checkbox').checked;
 
-            if (!firstName || !lastName || !email || !password || !confirmPassword) {
-                alert('Please fill in all fields.');
-                return;
-            }
-            if (!termsChecked) {
-                alert('You must agree to the Terms of Service and Privacy Policy.');
-                return;
-            }
-            if (password !== confirmPassword) {
-                alert('Passwords do not match.');
-                return;
-            }
-
-            // Strong password validation
+            if (!firstName || !lastName || !email || !password || !confirmPassword) { alert('Please fill in all fields.'); return; }
+            if (!termsChecked) { alert('You must agree to the Terms.'); return; }
+            if (password !== confirmPassword) { alert('Passwords do not match.'); return; }
             const strengthResult = checkPasswordStrength(password);
-            if (!strengthResult.text.includes('Strong')) {
-                alert('Your password is not strong enough. It must be at least 8 characters and include uppercase, lowercase, a digit, and a special character.');
+            if (!strengthResult.text.includes('Strong')) { alert('Password must be stronger.'); return; }
+
+            const { data, error } = await supabaseClient.auth.signUp({ email, password });
+            if (error) {
+                if (error.message.includes('already registered')) alert('An account with this email already exists.');
+                else alert('Signup error: ' + error.message);
                 return;
             }
-
-            // Retrieve existing users
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            if (users.some(u => u.email === email)) {
-                alert('An account with this email already exists. Please log in instead.');
-                return;
+            const user = data.user;
+            if (user) {
+                const { error: profileError } = await supabaseClient.from('profiles').insert({
+                    id: user.id,
+                    first_name: firstName,
+                    last_name: lastName,
+                    email: email,
+                    member_since: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                });
+                if (profileError) alert('Error saving profile: ' + profileError.message);
+                else { alert('Account created!'); window.location.href = './profile.html'; }
             }
-
-            const newUser = {
-                id: Date.now().toString(),
-                firstName,
-                lastName,
-                email,
-                password,
-                memberSince: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-            };
-
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-
-            const sessionData = {
-                id: newUser.id,
-                firstName: newUser.firstName,
-                lastName: newUser.lastName,
-                email: newUser.email,
-                memberSince: newUser.memberSince
-            };
-            localStorage.setItem('currentUser', JSON.stringify(sessionData));
-
-            alert('Account created successfully! Welcome to EXNYA.');
-            window.location.href = './profile.html';
         });
 
-        // --- Redirect if already logged in ---
-        if (localStorage.getItem('currentUser')) {
-            window.location.href = './profile.html';
-        }
+        // Redirect if already logged in
+        supabaseClient.auth.getSession().then(({ data: { session } }) => {
+            if (session) window.location.href = './profile.html';
+        });
     </script>
 </body>
+
 </html>

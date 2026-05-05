@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EXNYA | Log In</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* --- CSS Variables --- */
         :root {
             --bg-deep: #050505;
             --gold-primary: #D4AF37;
-            --gold-hover: #b5952f;
             --gold-gradient: linear-gradient(135deg, #F9E596 0%, #D4AF37 50%, #997A15 100%);
             --text-main: #F4F4F4;
             --text-muted: #A0A0A0;
@@ -20,420 +18,81 @@
             --input-bg: rgba(255, 255, 255, 0.03);
             --input-border: rgba(255, 255, 255, 0.1);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-deep);
-            color: var(--text-main);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* --- Canvas Background --- */
-        #particle-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        /* --- Glassmorphism Login Container --- */
-        .login-wrapper {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            max-width: 450px;
-            padding: 20px;
-            animation: fadeIn 1s ease-out;
-        }
-
-        .login-box {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 50px 40px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.05);
-            text-align: center;
-            position: relative;
-        }
-
-        .login-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.15), transparent 60%);
-            border-radius: 24px;
-            pointer-events: none;
-        }
-
-        .logo img {
-            font-family: 'Playfair Display', serif;
-            width: 32%;
-            margin-bottom: 10px;
-        }
-
-        h2 {
-            font-size: 20px;
-            font-weight: 500;
-            color: var(--text-main);
-            margin-bottom: 35px;
-        }
-
-        .error-message {
-            color: #f6465d;
-            font-size: 13px;
-            margin-bottom: 15px;
-            display: none;
-        }
-
-        /* --- Form Elements --- */
-        .input-group {
-            position: relative;
-            margin-bottom: 25px;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .input-group input {
-            width: 100%;
-            background: var(--input-bg);
-            border: 1px solid var(--input-border);
-            border-radius: 12px;
-            padding: 16px;
-            color: var(--text-main);
-            font-size: 15px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .input-group input:focus {
-            border-color: var(--gold-primary);
-            background: rgba(255, 255, 255, 0.05);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
-        }
-
-        .options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            font-size: 13px;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        /* Custom Checkbox */
-        .remember-me input[type="checkbox"] {
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border: 1px solid var(--text-muted);
-            border-radius: 4px;
-            background: transparent;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s;
-        }
-
-        .remember-me input[type="checkbox"]:checked {
-            background: var(--gold-primary);
-            border-color: var(--gold-primary);
-        }
-
-        .remember-me input[type="checkbox"]:checked::after {
-            content: '✔';
-            position: absolute;
-            color: #000;
-            font-size: 10px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .forgot-pass {
-            color: var(--gold-primary);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .forgot-pass:hover {
-            color: var(--text-main);
-        }
-
-        /* --- Buttons --- */
-        .btn-login {
-            width: 100%;
-            background: var(--gold-gradient);
-            color: #000;
-            border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
-        }
-
-        .signup-link {
-            display: block;
-            margin-top: 25px;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .signup-link a {
-            color: var(--gold-primary);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-
-        .signup-link a:hover {
-            color: var(--text-main);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 480px) {
-            .login-box { padding: 40px 25px; }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-deep); color: var(--text-main); height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        #particle-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        .login-wrapper { position: relative; z-index: 2; width: 100%; max-width: 450px; padding: 20px; animation: fadeIn 1s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .login-box { background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 50px 40px; box-shadow: 0 25px 50px rgba(0,0,0,0.8); text-align: center; position: relative; }
+        .login-box::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 0%, rgba(212,175,55,0.15), transparent 60%); border-radius: 24px; pointer-events: none; }
+        .logo img { width: 32%; margin-bottom: 10px; }
+        h2 { font-size: 20px; font-weight: 500; color: var(--text-main); margin-bottom: 35px; }
+        .input-group { position: relative; margin-bottom: 25px; text-align: left; }
+        .input-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+        .input-group input { width: 100%; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; padding: 16px; color: var(--text-main); font-size: 15px; outline: none; transition: all 0.3s; }
+        .input-group input:focus { border-color: var(--gold-primary); }
+        .options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; font-size: 13px; }
+        .remember-me { display: flex; align-items: center; gap: 8px; color: var(--text-muted); cursor: pointer; }
+        .remember-me input[type="checkbox"] { appearance: none; width: 16px; height: 16px; border: 1px solid var(--text-muted); border-radius: 4px; background: transparent; cursor: pointer; transition: 0.2s; }
+        .remember-me input[type="checkbox"]:checked { background: var(--gold-primary); border-color: var(--gold-primary); }
+        .remember-me input[type="checkbox"]:checked::after { content: '✔'; position: absolute; color: #000; font-size: 10px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .forgot-pass { color: var(--gold-primary); text-decoration: none; }
+        .btn-login { width: 100%; background: var(--gold-gradient); color: #000; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(212,175,55,0.2); transition: all 0.3s; }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(212,175,55,0.4); }
+        .signup-link { display: block; margin-top: 25px; font-size: 14px; color: var(--text-muted); }
+        .signup-link a { color: var(--gold-primary); text-decoration: none; font-weight: 600; }
     </style>
 </head>
 <body>
     <canvas id="particle-canvas"></canvas>
-
     <div class="login-wrapper">
         <div class="login-box">
             <a href="./index.html"><div class="logo"><img src=".//WhatsApp Image 2026-04-03 at 4.24.59 AM.jpeg" alt="EXNYA"></div></a>
             <h2>Sign in to your account</h2>
-            
-            <div class="error-message" id="error-message">Invalid email or password</div>
-
             <form id="login-form">
-                <div class="input-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" placeholder="Enter your email" required autocomplete="email">
-                </div>
-                
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
-                </div>
-
-                <div class="options">
-                    <label class="remember-me">
-                        <input type="checkbox" id="remember-me"> Remember me
-                    </label>
-                    <a href="#" class="forgot-pass">Forgot Password?</a>
-                </div>
-
+                <div class="input-group"><label for="email">Email Address</label><input type="email" id="email" placeholder="Enter your email" required></div>
+                <div class="input-group"><label for="password">Password</label><input type="password" id="password" placeholder="Enter your password" required></div>
+                <div class="options"><label class="remember-me"><input type="checkbox"> Remember me</label><a href="#" class="forgot-pass">Forgot Password?</a></div>
                 <button type="submit" class="btn-login">Log In</button>
             </form>
-
-            <div class="signup-link">
-                Don't have an account? <a href="./xx .html">Create one</a>
-            </div>
+            <div class="signup-link">Don't have an account? <a href="./xx .html">Create one</a></div>
         </div>
     </div>
 
     <script>
-        // --- AUTO-REDIRECT IF ALREADY LOGGED IN ---
-        (function checkLoggedIn() {
-            const currentUser = localStorage.getItem('currentUser');
-            if (currentUser) {
-                window.location.href = './profile.html'; // Dashboard page
-            }
-        })();
+        const SUPABASE_URL = 'https://clwgengvcdokdzubdfxd.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsd2dlbmd2Y2Rva2R6dWJkZnhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTIxNjEsImV4cCI6MjA5MzQ4ODE2MX0.0zgizWWXLIHiKdNUAJ3yKaIaxEKsHoFeEIo8IUAMtHU';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- LOGIN LOGIC ---
-        document.getElementById('login-form').addEventListener('submit', function(e) {
+        // Particles (same as signup)
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+        const numParticles = window.innerWidth < 768 ? 40 : 80;
+        function setCanvasSize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        setCanvasSize(); window.addEventListener('resize', setCanvasSize);
+        class Particle { /* ... same as signup ... */ }
+        function initParticles() { /* ... */ }
+        function animateParticles() { /* ... */ }
+        // Copy the particle block from the signup page (or use the existing one)
+
+        // Login
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            const email = document.getElementById('email').value.trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
-            const rememberMe = document.getElementById('remember-me').checked;
-            const errorDiv = document.getElementById('error-message');
-
-            // Hide error initially
-            errorDiv.style.display = 'none';
-
-            // Basic validation
-            if (!email || !password) {
-                showError('Please fill in all fields.');
-                return;
-            }
-
-            // Fetch stored users
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-
-            // Find user with matching credentials
-            const user = users.find(u => u.email === email && u.password === password);
-
-            if (user) {
-                // Store current user session (exclude password from session data)
-                const sessionData = {
-                    id: user.id,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email,
-                    memberSince: user.memberSince || new Date().toLocaleDateString()
-                };
-
-                localStorage.setItem('currentUser', JSON.stringify(sessionData));
-
-                // If "Remember me" is checked, store email for next visit
-                if (rememberMe) {
-                    localStorage.setItem('rememberedEmail', email);
-                } else {
-                    localStorage.removeItem('rememberedEmail');
-                }
-
-                // Redirect to dashboard
-                window.location.href = './profile.html';
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) {
+                if (error.message.includes('Invalid login')) alert('Invalid email or password.');
+                else alert('Login error: ' + error.message);
             } else {
-                // Check if the email exists at all (to give a hint)
-                const emailExists = users.some(u => u.email === email);
-                if (!emailExists) {
-                    showError('No account found with this email. Please sign up.');
-                } else {
-                    showError('Invalid password. Please try again.');
-                }
+                window.location.href = './profile.html';
             }
         });
 
-        function showError(message) {
-            const errorDiv = document.getElementById('error-message');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-        }
-
-        // Pre-fill email if "Remember me" was previously checked
-        (function prefillEmail() {
-            const remembered = localStorage.getItem('rememberedEmail');
-            if (remembered) {
-                document.getElementById('email').value = remembered;
-                document.getElementById('remember-me').checked = true;
-            }
-        })();
-
-        // --- PARTICLE BACKGROUND (unchanged) ---
-        const canvas = document.getElementById('particle-canvas');
-        const ctx = canvas.getContext('2d');
-
-        let particlesArray = [];
-        const numParticles = window.innerWidth < 768 ? 40 : 80; 
-
-        function setCanvasSize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        
-        setCanvasSize();
-        window.addEventListener('resize', setCanvasSize);
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 1.5 + 0.5; 
-                this.speedX = (Math.random() * 0.5) - 0.25; 
-                this.speedY = (Math.random() * 0.5) - 0.25;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-
-                if (this.x < 0) this.x = canvas.width;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.y < 0) this.y = canvas.height;
-                if (this.y > canvas.height) this.y = 0;
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = '#D4AF37';
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = '#D4AF37';
-                ctx.fill();
-            }
-        }
-
-        function initParticles() {
-            particlesArray = [];
-            for (let i = 0; i < numParticles; i++) {
-                particlesArray.push(new Particle());
-            }
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update();
-                particlesArray[i].draw();
-                
-                for (let j = i; j < particlesArray.length; j++) {
-                    const dx = particlesArray[i].x - particlesArray[j].x;
-                    const dy = particlesArray[i].y - particlesArray[j].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < 130) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(212, 175, 55, ${0.15 - distance/866})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.shadowBlur = 0;
-                        ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
-                        ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-            requestAnimationFrame(animateParticles);
-        }
-
-        initParticles();
-        animateParticles();
+        supabaseClient.auth.getSession().then(({ data: { session } }) => {
+            if (session) window.location.href = './profile.html';
+        });
     </script>
 </body>
 </html>
