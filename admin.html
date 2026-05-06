@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXNYA | Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg-base: #080b0f;
+            --bg-elevated: #12161c;
+            --bg-hover: #1e2530;
+            --brand-yellow: #fcd535;
+            --text-primary: #eaecef;
+            --text-secondary: #848e9c;
+            --border-light: #2b3139;
+            --trade-green: #0ecb81;
+            --trade-red: #f6465d;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+        body { background:var(--bg-base); color:var(--text-primary); min-height:100vh; display:flex; }
+        #particle-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+        .app-container { position:relative; z-index:1; display:flex; width:100%; }
+        .sidebar { width:250px; background:var(--bg-elevated); backdrop-filter:blur(20px); border-right:1px solid var(--border-light); padding:24px 0; display:flex; flex-direction:column; }
+        .sidebar-logo { padding:0 24px 24px; border-bottom:1px solid var(--border-light); }
+        .sidebar-logo img { height:32px; }
+        .sidebar-nav { flex:1; padding:20px 12px; }
+        .sidebar-nav a { display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:10px; color:var(--text-secondary); text-decoration:none; transition:0.2s; }
+        .sidebar-nav a:hover, .sidebar-nav a.active { background:var(--bg-hover); color:var(--brand-yellow); }
+        .main-content { flex:1; padding:32px 40px; overflow-y:auto; }
+        .top-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; }
+        .btn-logout { background:transparent; border:1px solid var(--border-light); padding:6px 16px; border-radius:30px; cursor:pointer; color:var(--text-secondary); }
+        .btn-logout:hover { border-color:var(--trade-red); color:var(--trade-red); }
+        .card { background:var(--bg-elevated); border:1px solid var(--border-light); border-radius:24px; padding:28px; margin-bottom:24px; }
+        table { width:100%; border-collapse: collapse; }
+        th, td { text-align:left; padding:12px 8px; border-bottom:1px solid var(--border-light); }
+        th { color:var(--text-secondary); font-size:13px; }
+        button { background:var(--brand-yellow); border:none; padding:6px 12px; border-radius:6px; font-weight:600; cursor:pointer; }
+        button.danger { background:var(--trade-red); }
+        input, select { background:var(--bg-base); border:1px solid var(--border-light); padding:8px 12px; border-radius:8px; color:var(--text-primary); width:100%; }
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:200; justify-content:center; align-items:center; }
+        .modal-content { background:var(--bg-elevated); border:1px solid var(--border-light); border-radius:16px; padding:24px; width:90%; max-width:400px; }
+    </style>
+</head>
+<body>
+    <canvas id="particle-canvas"></canvas>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <img src=".//WhatsApp Image 2026-04-03 at 4.24.59 AM.jpeg" alt="EXNYA">
+            </div>
+            <nav class="sidebar-nav">
+                <a href="./profile.html">📊 Dashboard</a>
+                <a href="#" class="active">⚙️ Admin</a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="top-bar">
+                <h1>Admin Panel</h1>
+                <button class="btn-logout" onclick="logout()">🚪 Sign Out</button>
+            </div>
+            <div id="admin-content">
+                <p style="color:var(--text-secondary)">Loading...</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Asset Modal -->
+    <div class="modal" id="asset-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom:16px;" id="modal-title">Add Asset</h3>
+            <input type="hidden" id="edit-id">
+            <div style="margin-bottom:12px;">
+                <label>User</label>
+                <select id="modal-user" style="width:100%;">
+                    <!-- populated dynamically -->
+                </select>
+            </div>
+            <div style="margin-bottom:12px;">
+                <label>Asset Symbol</label>
+                <input type="text" id="modal-symbol" placeholder="e.g., BTC">
+            </div>
+            <div style="margin-bottom:16px;">
+                <label>Quantity</label>
+                <input type="number" id="modal-qty" step="any" placeholder="0.00">
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button onclick="closeModal()" style="background:transparent; border:1px solid var(--border-light); color:var(--text-secondary);">Cancel</button>
+                <button onclick="saveAsset()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://clwgengvcdokdzubdfxd.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsd2dlbmd2Y2Rva2R6dWJkZnhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTIxNjEsImV4cCI6MjA5MzQ4ODE2MX0.0zgizWWXLIHiKdNUAJ3yKaIaxEKsHoFeEIo8IUAMtHU';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Particle animation (identical to dashboard)
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = []; const numParticles = 80;
+        function setCanvasSize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        setCanvasSize(); window.addEventListener('resize', setCanvasSize);
+        class Particle {
+            constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 1.8 + 0.4; this.speedX = (Math.random() * 0.8) - 0.4; this.speedY = (Math.random() * 0.8) - 0.4; }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0) this.x = canvas.width; if (this.x > canvas.width) this.x = 0; if (this.y < 0) this.y = canvas.height; if (this.y > canvas.height) this.y = 0; }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = '#D4AF37'; ctx.shadowBlur = 8; ctx.shadowColor = '#D4AF37'; ctx.fill(); }
+        }
+        function initParticles() { particlesArray = []; for (let i = 0; i < numParticles; i++) particlesArray.push(new Particle()); }
+        function animateParticles() { ctx.clearRect(0,0,canvas.width,canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); for (let j = i+1; j < particlesArray.length; j++) { const dx = particlesArray[i].x - particlesArray[j].x; const dy = particlesArray[i].y - particlesArray[j].y; const distance = Math.sqrt(dx*dx + dy*dy); if (distance < 130) { ctx.beginPath(); ctx.strokeStyle = `rgba(212,175,55,${0.15 - distance/866})`; ctx.lineWidth = 0.5; ctx.shadowBlur = 0; ctx.moveTo(particlesArray[i].x, particlesArray[i].y); ctx.lineTo(particlesArray[j].x, particlesArray[j].y); ctx.stroke(); } } } requestAnimationFrame(animateParticles); }
+        initParticles(); animateParticles();
+
+        // ---- Admin check ----
+        async function checkAdmin() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                window.location.href = './pl.html';
+                return;
+            }
+            // Fetch own profile to verify is_admin
+            const { data: profile } = await supabaseClient.from('profiles').select('is_admin').eq('id', session.user.id).single();
+            if (!profile || profile.is_admin !== true) {
+                document.getElementById('admin-content').innerHTML = '<h2 style="color:var(--trade-red)">Access Denied</h2><p>You are not an admin.</p>';
+                return;
+            }
+            // Load admin panel
+            loadAdminPanel();
+        }
+
+        let allUsers = []; // cache of user profiles
+
+        async function loadAdminPanel() {
+            // Fetch all users
+            const { data: users, error } = await supabaseClient.from('profiles').select('*');
+            if (error) {
+                document.getElementById('admin-content').innerHTML = '<p>Error loading users.</p>';
+                return;
+            }
+            allUsers = users;
+            // Fetch all assets
+            const { data: assets } = await supabaseClient.from('user_assets').select('*');
+            // Render
+            renderAdmin(users, assets);
+            // Populate user select in modal
+            const userSelect = document.getElementById('modal-user');
+            userSelect.innerHTML = users.map(u => `<option value="${u.id}">${u.first_name || ''} ${u.last_name || ''} (${u.email})</option>`).join('');
+        }
+
+        function renderAdmin(users, assets) {
+            let html = '<div class="card"><h2>Users & Assets</h2>';
+            html += '<table><thead><tr><th>User</th><th>Email</th><th>Assets</th><th>Actions</th></tr></thead><tbody>';
+            users.forEach(user => {
+                const userAssets = assets ? assets.filter(a => a.user_id === user.id) : [];
+                const assetList = userAssets.length === 0 ? 'None' : userAssets.map(a => `${a.asset_symbol} (${Number(a.quantity).toFixed(4)})`).join(', ');
+                html += `<tr>
+                    <td>${user.first_name || ''} ${user.last_name || ''}</td>
+                    <td>${user.email}</td>
+                    <td>${assetList}</td>
+                    <td><button onclick="openAddAsset('${user.id}')">+ Add</button></td>
+                </tr>`;
+                // For each asset, show edit/delete
+                userAssets.forEach(a => {
+                    html += `<tr style="font-size:13px;">
+                        <td></td><td></td>
+                        <td style="padding-left:24px;">${a.asset_symbol} - ${Number(a.quantity).toFixed(4)}</td>
+                        <td>
+                            <button onclick="openEditAsset('${a.id}', '${a.user_id}', '${a.asset_symbol}', ${a.quantity})" style="margin-right:4px;">✏️</button>
+                            <button onclick="deleteAsset('${a.id}')" class="danger">🗑️</button>
+                        </td>
+                    </tr>`;
+                });
+            });
+            html += '</tbody></table></div>';
+            document.getElementById('admin-content').innerHTML = html;
+        }
+
+        function openAddAsset(userId) {
+            document.getElementById('asset-modal').style.display = 'flex';
+            document.getElementById('modal-title').textContent = 'Add Asset';
+            document.getElementById('edit-id').value = '';
+            document.getElementById('modal-user').value = userId;
+            document.getElementById('modal-symbol').value = '';
+            document.getElementById('modal-qty').value = '';
+        }
+
+        function openEditAsset(assetId, userId, symbol, qty) {
+            document.getElementById('asset-modal').style.display = 'flex';
+            document.getElementById('modal-title').textContent = 'Edit Asset';
+            document.getElementById('edit-id').value = assetId;
+            document.getElementById('modal-user').value = userId;
+            document.getElementById('modal-symbol').value = symbol;
+            document.getElementById('modal-qty').value = qty;
+        }
+
+        function closeModal() {
+            document.getElementById('asset-modal').style.display = 'none';
+        }
+
+        async function saveAsset() {
+            const assetId = document.getElementById('edit-id').value;
+            const userId = document.getElementById('modal-user').value;
+            const symbol = document.getElementById('modal-symbol').value.trim().toUpperCase();
+            const qty = parseFloat(document.getElementById('modal-qty').value);
+            if (!symbol || isNaN(qty)) {
+                alert('Valid symbol and quantity required.');
+                return;
+            }
+            if (assetId) {
+                // Update
+                const { error } = await supabaseClient.from('user_assets').update({ asset_symbol: symbol, quantity: qty }).eq('id', assetId);
+                if (error) alert('Error: ' + error.message);
+            } else {
+                // Insert
+                const { error } = await supabaseClient.from('user_assets').insert({ user_id: userId, asset_symbol: symbol, quantity: qty });
+                if (error) alert('Error: ' + error.message);
+            }
+            closeModal();
+            loadAdminPanel();
+        }
+
+        async function deleteAsset(assetId) {
+            if (confirm('Delete this asset?')) {
+                const { error } = await supabaseClient.from('user_assets').delete().eq('id', assetId);
+                if (error) alert('Error: ' + error.message);
+                loadAdminPanel();
+            }
+        }
+
+        function logout() {
+            supabaseClient.auth.signOut().then(() => window.location.href = './pl.html');
+        }
+
+        checkAdmin();
+    </script>
+</body>
+</html>

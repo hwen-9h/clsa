@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EXNYA | Dashboard</title>
+    <title>EXNYA | Markets</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -13,7 +13,6 @@
             --bg-elevated: #12161c;
             --bg-hover: #1e2530;
             --brand-yellow: #fcd535;
-            --brand-yellow-hover: #f0b90b;
             --text-primary: #eaecef;
             --text-secondary: #848e9c;
             --border-light: #2b3139;
@@ -54,7 +53,6 @@
             width: 100%;
         }
 
-        /* Sidebar – logo removed, only toggle and nav */
         .sidebar {
             width: var(--sidebar-width);
             background: var(--bg-elevated);
@@ -138,7 +136,6 @@
             justify-content: center;
         }
 
-        /* Main content */
         .main-content {
             flex: 1;
             padding: 30px 35px;
@@ -154,7 +151,6 @@
             gap: 16px;
         }
 
-        /* Left column: logo on top, then avatar + name/email */
         .left-group {
             display: flex;
             flex-direction: column;
@@ -165,7 +161,7 @@
         .top-logo {
             height: 38px;
             width: auto;
-            /* filter: drop-shadow(0 2px 8px rgba(252,213,53,0.3)); */
+            filter: drop-shadow(0 2px 8px rgba(252, 213, 53, 0.3));
         }
 
         .user-info-row {
@@ -224,93 +220,6 @@
             color: var(--trade-red);
         }
 
-        /* Premium Quick action buttons */
-        .quick-actions {
-            display: flex;
-            gap: 14px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .action-btn {
-            flex: 1;
-            min-width: 130px;
-            padding: 16px 24px;
-            border-radius: 16px;
-            border: none;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            position: relative;
-            overflow: hidden;
-            color: var(--text-primary);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            letter-spacing: 0.5px;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-        }
-
-        .action-btn::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .action-btn:hover::after {
-            opacity: 1;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .action-btn.buy {
-            background: linear-gradient(135deg, rgba(14, 203, 129, 0.15), rgba(14, 203, 129, 0.05));
-            border-color: rgba(14, 203, 129, 0.3);
-            color: #4cffa2;
-        }
-
-        .action-btn.buy:hover {
-            background: linear-gradient(135deg, rgba(14, 203, 129, 0.25), rgba(14, 203, 129, 0.1));
-            box-shadow: 0 12px 30px rgba(14, 203, 129, 0.3);
-        }
-
-        .action-btn.sell {
-            background: linear-gradient(135deg, rgba(246, 70, 93, 0.15), rgba(246, 70, 93, 0.05));
-            border-color: rgba(246, 70, 93, 0.3);
-            color: #ff6b7a;
-        }
-
-        .action-btn.sell:hover {
-            background: linear-gradient(135deg, rgba(246, 70, 93, 0.25), rgba(246, 70, 93, 0.1));
-            box-shadow: 0 12px 30px rgba(246, 70, 93, 0.3);
-        }
-
-        .action-btn.withdraw {
-            background: linear-gradient(135deg, rgba(252, 213, 53, 0.15), rgba(252, 213, 53, 0.05));
-            border-color: rgba(252, 213, 53, 0.3);
-            color: #ffdf6b;
-        }
-
-        .action-btn.withdraw:hover {
-            background: linear-gradient(135deg, rgba(252, 213, 53, 0.25), rgba(252, 213, 53, 0.1));
-            box-shadow: 0 12px 30px rgba(252, 213, 53, 0.3);
-        }
-
         .card {
             background: var(--bg-elevated);
             border: 1px solid var(--border-light);
@@ -331,35 +240,77 @@
             font-weight: 600;
         }
 
-        .profile-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .profile-field {
-            background: var(--bg-base);
-            border-radius: 10px;
-            padding: 14px;
-            border: 1px solid var(--border-light);
-        }
-
-        .profile-field label {
-            font-size: 12px;
+        .update-time {
             color: var(--text-secondary);
-            display: block;
-            margin-bottom: 4px;
+            font-size: 12px;
+            margin-bottom: 16px;
         }
 
-        .balance-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 10px 8px;
             border-bottom: 1px solid var(--border-light);
         }
 
-        .balance-row:last-child {
-            border-bottom: none;
+        th {
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        td {
+            font-size: 13px;
+        }
+
+        .coin-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .coin-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .price-up {
+            color: var(--trade-green);
+        }
+
+        .price-down {
+            color: var(--trade-red);
+        }
+
+        .user-holdings {
+            font-size: 12px;
+            color: var(--brand-yellow);
+        }
+
+        .no-holdings {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .loading-text {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 20px;
         }
 
         @media (max-width: 768px) {
@@ -378,14 +329,6 @@
             .main-content {
                 padding: 20px 15px;
             }
-
-            .profile-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .quick-actions {
-                flex-direction: column;
-            }
         }
     </style>
 </head>
@@ -394,22 +337,13 @@
     <canvas id="particle-canvas"></canvas>
     <div class="app-container">
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
-                ☰
-            </div>
+            <div class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">☰</div>
             <nav class="sidebar-nav">
-                <a href="#" class="active">
-                    <span class="nav-icon">📊</span> <span class="nav-text">Overview</span>
-                </a>
-                <a href="./live-portfolio.html">
-                    <span class="nav-icon">📈</span> <span class="nav-text">Live Portfolio</span>
-                </a>
-                <a href="./markets.html">
-                    <span class="nav-icon">🌐</span> <span class="nav-text">Markets</span>
-                </a>
-                <a href="#">
-                    <span class="nav-icon">🔒</span> <span class="nav-text">Security</span>
-                </a>
+                <a href="./profile.html"><span class="nav-icon">📊</span> <span class="nav-text">Overview</span></a>
+                <a href="./live-portfolio.html"><span class="nav-icon">📈</span> <span class="nav-text">Live
+                        Portfolio</span></a>
+                <a href="#" class="active"><span class="nav-icon">🌐</span> <span class="nav-text">Markets</span></a>
+                <a href="#"><span class="nav-icon">🔒</span> <span class="nav-text">Security</span></a>
             </nav>
             <div class="sidebar-footer"></div>
         </aside>
@@ -417,7 +351,6 @@
         <main class="main-content">
             <div class="top-bar">
                 <div class="left-group">
-                    <!-- EXNYA logo above all -->
                     <img class="top-logo" src=".//WhatsApp Image 2026-04-03 at 4.24.59 AM.jpeg" alt="EXNYA">
                     <div class="user-info-row">
                         <div class="avatar" id="user-initials">U</div>
@@ -432,32 +365,31 @@
                 </div>
             </div>
 
-            <!-- Account Details Card -->
             <div class="card">
                 <div class="card-header">
-                    <h2>👤 Account Details</h2>
+                    <h2>All Cryptocurrencies</h2>
+                    <span style="color:var(--text-secondary); font-size:12px;">Auto‑refresh every 30s</span>
                 </div>
-                <div class="profile-grid">
-                    <div class="profile-field"><label>Full Name</label><span id="detail-name">--</span></div>
-                    <div class="profile-field"><label>Email</label><span id="detail-email">--</span></div>
-                    <div class="profile-field"><label>Member Since</label><span id="detail-member">--</span></div>
-                </div>
-            </div>
+                <div class="update-time" id="update-time">Last updated: --</div>
 
-            <!-- Premium Buy / Sell / Withdraw Buttons -->
-            <div class="quick-actions">
-                <button class="action-btn buy" onclick="alert('Buy functionality coming soon')">🟢 Buy</button>
-                <button class="action-btn sell" onclick="alert('Sell functionality coming soon')">🔴 Sell</button>
-                <button class="action-btn withdraw" onclick="alert('Withdraw functionality coming soon')">🟡
-                    Withdraw</button>
-            </div>
-
-            <!-- Assets Card -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>💰 Your Assets</h2>
-                </div>
-                <div id="assets-list">Loading assets...</div>
+                <table id="markets-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Price (USD)</th>
+                            <th>24h Change</th>
+                            <th>Market Cap</th>
+                            <th>Volume (24h)</th>
+                            <th>Your Holdings</th>
+                        </tr>
+                    </thead>
+                    <tbody id="markets-body">
+                        <tr>
+                            <td colspan="7" class="loading-text">Loading market data...</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </main>
     </div>
@@ -472,7 +404,7 @@
         if (localStorage.getItem('sidebarCollapsed') === 'true') sidebar.classList.add('collapsed');
         function toggleSidebar() { sidebar.classList.toggle('collapsed'); localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed')); }
 
-        // Particles
+        // Particles (same as before)
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         let particlesArray = []; const numParticles = 80;
@@ -487,58 +419,100 @@
         function animateParticles() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); for (let j = i + 1; j < particlesArray.length; j++) { const dx = particlesArray[i].x - particlesArray[j].x; const dy = particlesArray[i].y - particlesArray[j].y; const distance = Math.sqrt(dx * dx + dy * dy); if (distance < 130) { ctx.beginPath(); ctx.strokeStyle = `rgba(212,175,55,${0.15 - distance / 866})`; ctx.lineWidth = 0.5; ctx.shadowBlur = 0; ctx.moveTo(particlesArray[i].x, particlesArray[i].y); ctx.lineTo(particlesArray[j].x, particlesArray[j].y); ctx.stroke(); } } } requestAnimationFrame(animateParticles); }
         initParticles(); animateParticles();
 
-        // Auth & profile
         let currentUser = null;
-        async function loadProfile() {
+        async function loadUser() {
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) { window.location.href = './pl.html'; return; }
+            if (!session) { window.location.href = './pl.html'; return false; }
             currentUser = session.user;
+            const { data: profile } = await supabaseClient.from('profiles').select('first_name,last_name').eq('id', currentUser.id).single();
+            const firstName = profile?.first_name || currentUser.email.split('@')[0];
+            document.getElementById('user-initials').textContent = firstName.charAt(0).toUpperCase();
+            document.getElementById('user-fullname').textContent = firstName;
+            document.getElementById('user-email-display').textContent = currentUser.email;
+            return true;
+        }
 
-            const { data: profile, error } = await supabaseClient
-                .from('profiles')
-                .select('*')
-                .eq('id', currentUser.id)
-                .single();
+        async function fetchAllMarkets() {
+            try {
+                const response = await fetch('https://api.coinlore.net/api/tickers/?limit=100');
+                if (!response.ok) { console.error('CoinLore API error', response.status); return null; }
+                const json = await response.json();
+                return json.data;
+            } catch (err) { console.error('Fetch error:', err); return null; }
+        }
 
-            if (!error && profile) {
-                const fullName = `${profile.first_name} ${profile.last_name}`.trim();
-                document.getElementById('user-initials').textContent = (profile.first_name || 'U')[0].toUpperCase();
-                document.getElementById('user-fullname').textContent = fullName || currentUser.email;
-                document.getElementById('user-email-display').textContent = profile.email;
-                document.getElementById('detail-name').textContent = fullName || '—';
-                document.getElementById('detail-email').textContent = profile.email;
-                document.getElementById('detail-member').textContent = profile.member_since || '—';
-            } else {
-                document.getElementById('user-initials').textContent = currentUser.email[0].toUpperCase();
-                document.getElementById('user-fullname').textContent = currentUser.email;
-                document.getElementById('user-email-display').textContent = currentUser.email;
-                document.getElementById('detail-name').textContent = currentUser.email;
-                document.getElementById('detail-email').textContent = currentUser.email;
-                document.getElementById('detail-member').textContent = '—';
-            }
+        async function getUserHoldings() {
+            const { data: assets, error } = await supabaseClient.from('user_assets').select('asset_symbol, quantity').eq('user_id', currentUser.id);
+            if (error || !assets) return {};
+            const holdingsMap = {};
+            assets.forEach(a => { holdingsMap[a.asset_symbol] = Number(a.quantity); });
+            return holdingsMap;
+        }
 
-            const { data: assets } = await supabaseClient
-                .from('user_assets')
-                .select('*')
-                .eq('user_id', currentUser.id);
+        function formatLargeNumber(num) {
+            if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
+            if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+            if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+            if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+            return num.toFixed(2);
+        }
 
-            const container = document.getElementById('assets-list');
-            if (!assets || assets.length === 0) {
-                container.innerHTML = '<p style="color:var(--text-secondary)">No assets yet.</p>';
+        async function updateMarkets() {
+            const tbody = document.getElementById('markets-body');
+            tbody.innerHTML = '<tr><td colspan="7" class="loading-text">Fetching latest data...</td></tr>';
+            const [marketData, userHoldings] = await Promise.all([fetchAllMarkets(), getUserHoldings()]);
+            if (!marketData) {
+                tbody.innerHTML = '<tr><td colspan="7" class="loading-text" style="color:var(--trade-red)">Failed to load market data. Retrying soon...</td></tr>';
                 return;
             }
             let html = '';
-            assets.forEach(a => {
-                html += `<div class="balance-row"><span>${a.asset_symbol}</span><span>${Number(a.quantity).toFixed(4)} ${a.asset_symbol}</span></div>`;
+            marketData.forEach((coin, index) => {
+                const price = parseFloat(coin.price_usd);
+                const change = parseFloat(coin.percent_change_24h);
+                const marketCap = parseFloat(coin.market_cap_usd);
+                const volume = parseFloat(coin.volume24);
+                const symbol = coin.symbol;
+                const changeClass = change >= 0 ? 'price-up' : 'price-down';
+                const changeSign = change >= 0 ? '+' : '';
+                const userQty = userHoldings[symbol] || 0;
+                const holdingValue = userQty * price;
+                const holdingsDisplay = userQty > 0
+                    ? `<span class="user-holdings">${userQty.toFixed(4)} <br> $${holdingValue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>`
+                    : `<span class="no-holdings">—</span>`;
+                html += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>
+                        <div class="coin-info">
+                            <div class="coin-icon" style="background:${getCoinColor(symbol)}">${symbol[0]}</div>
+                            <span style="font-weight:600;">${coin.name}</span>
+                            <span style="color:var(--text-secondary); font-size:11px;">${symbol}</span>
+                        </div>
+                    </td>
+                    <td>$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: price < 1 ? 6 : 2 })}</td>
+                    <td class="${changeClass}">${changeSign}${change.toFixed(2)}%</td>
+                    <td>$${formatLargeNumber(marketCap)}</td>
+                    <td>$${formatLargeNumber(volume)}</td>
+                    <td>${holdingsDisplay}</td>
+                </tr>`;
             });
-            container.innerHTML = html;
+            tbody.innerHTML = html;
+            document.getElementById('update-time').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
         }
 
-        function logout() {
-            supabaseClient.auth.signOut().then(() => window.location.href = './pl.html');
+        function getCoinColor(symbol) {
+            const colors = { BTC: '#F7931A', ETH: '#627EEA', SOL: '#14F195', USDT: '#26A17B', ADA: '#0033AD', USDC: '#2775CA', XRP: '#0085FF', DOGE: '#C2A633', DOT: '#E6007A' };
+            return colors[symbol] || '#555';
         }
 
-        loadProfile();
+        function logout() { supabaseClient.auth.signOut().then(() => window.location.href = './pl.html'); }
+
+        (async () => {
+            const loggedIn = await loadUser();
+            if (!loggedIn) return;
+            await updateMarkets();
+            setInterval(updateMarkets, 30000);
+        })();
     </script>
 </body>
 
