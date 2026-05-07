@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EXNYA | Admin</title>
+    <title>EXNYA | News</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Sora:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -58,7 +58,7 @@
             .main-content { padding:20px 16px; }
         }
 
-        .main-content { flex:1; padding:28px 32px; overflow-y:auto; max-width:1200px; }
+        .main-content { flex:1; padding:28px 32px; overflow-y:auto; max-width:900px; }
         .top-bar { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px; flex-wrap:wrap; gap:16px; }
         .left-group { display:flex; flex-direction:column; align-items:flex-start; gap:16px; }
         .top-logo { height:34px; width:auto; }
@@ -87,12 +87,14 @@
             display:flex; align-items:center; gap:8px; margin-bottom:24px; color:var(--text-primary);
         }
         .card h2 svg { width:15px; height:15px; stroke:var(--brand-yellow); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
-        table { width:100%; border-collapse:collapse; font-size:13px; }
-        th { text-align:left; padding:10px 8px; font-size:10.5px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); border-bottom:1px solid var(--border-subtle); }
-        td { padding:10px 8px; border-bottom:1px solid var(--border-subtle); font-family:'JetBrains Mono',monospace; }
-        .btn { padding:6px 12px; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:12px; }
-        .btn-primary { background:var(--brand-yellow); color:#000; }
-        .btn-danger { background:var(--trade-red); color:#fff; margin-left:4px; }
+        .news-item { padding:16px 0; border-bottom:1px solid var(--border-subtle); transition:background 0.2s; }
+        .news-item:last-child { border-bottom:none; }
+        .news-item a { text-decoration:none; color:inherit; display:block; }
+        .news-title { font-family:'Sora',sans-serif; font-size:16px; font-weight:600; color:var(--text-primary); margin-bottom:6px; transition:color 0.2s; }
+        .news-item a:hover .news-title { color:var(--brand-yellow); }
+        .news-meta { display:flex; gap:16px; font-size:12px; color:var(--text-muted); margin-bottom:6px; }
+        .news-desc { font-size:13px; color:var(--text-secondary); line-height:1.5; }
+        .loading-text { text-align:center; color:var(--text-muted); padding:40px; }
     </style>
 </head>
 <body>
@@ -102,7 +104,15 @@
             <div class="sidebar-toggle" onclick="toggleSidebar()"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
             <nav class="sidebar-nav">
                 <a href="./profile.html"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="nav-text">Overview</span></a>
-                <a href="#" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></span><span class="nav-text">Admin</span></a>
+                <a href="./wallet.html"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M12 9v4M10 11h4"/></svg></span><span class="nav-text">Wallet</span></a>
+                <a href="./live-portfolio.html"><span class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span><span class="nav-text">Live Portfolio</span></a>
+                <a href="./markets.html"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span class="nav-text">Markets</span></a>
+                <a href="./swap.html">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>
+                    <span class="nav-text">Swap</span>
+                </a>
+                <a href="#" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg></span><span class="nav-text">News</span></a>
+                <a href="./security.html"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span class="nav-text">Security</span></a>
             </nav>
             <div class="sidebar-footer"></div>
         </aside>
@@ -113,9 +123,9 @@
                 <div class="left-group">
                     <img class="top-logo" src=".//WhatsApp Image 2026-04-03 at 4.24.59 AM.jpeg" alt="EXNYA">
                     <div class="user-info-row">
-                        <div class="avatar" id="user-initials">A</div>
+                        <div class="avatar" id="user-initials">U</div>
                         <div class="user-text">
-                            <div class="profile-name" id="user-fullname">Admin</div>
+                            <div class="profile-name" id="user-fullname">Loading...</div>
                             <div class="user-email" id="user-email-display">--</div>
                         </div>
                     </div>
@@ -126,8 +136,8 @@
             </div>
 
             <div class="card">
-                <h2><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg> Admin Panel</h2>
-                <div id="admin-content">Loading...</div>
+                <h2><svg viewBox="0 0 24 24"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg> Latest Crypto News</h2>
+                <div id="news-container"><p class="loading-text">Loading news...</p></div>
             </div>
         </main>
     </div>
@@ -170,11 +180,10 @@
         }
 
         let currentUser = getCachedUser();
-        let allUsers = [];
 
         if (currentUser) {
             console.log('⚡ Using cached session');
-            checkAdmin(currentUser).catch(console.error);
+            loadNewsData(currentUser).catch(console.error);
         } else {
             console.log('🕒 No cached session – waiting for auth listener');
         }
@@ -183,30 +192,57 @@
             if (session) {
                 if (!currentUser || currentUser.id !== session.user.id) {
                     currentUser = session.user;
-                    await checkAdmin(currentUser).catch(console.error);
+                    await loadNewsData(currentUser).catch(console.error);
                 }
             } else {
                 window.location.href = './pl.html';
             }
         });
 
-        async function checkAdmin(user) {
+        async function loadNewsData(user) {
+            const { data: profile } = await supabaseClient.from('profiles').select('first_name,last_name').eq('id', user.id).single();
+            const firstName = profile?.first_name || user.email.split('@')[0];
+            document.getElementById('user-initials').textContent = firstName.charAt(0).toUpperCase();
+            document.getElementById('user-fullname').textContent = firstName;
             document.getElementById('user-email-display').textContent = user.email;
-            const { data: profile } = await supabaseClient.from('profiles').select('is_admin,first_name').eq('id', user.id).single();
-            if (!profile || profile.is_admin !== true) {
-                document.getElementById('admin-content').innerHTML = '<p style="color:var(--trade-red)">Access denied.</p>';
-                return;
-            }
-            document.getElementById('user-fullname').textContent = profile.first_name || 'Admin';
-            document.getElementById('user-initials').textContent = (profile.first_name || 'A')[0].toUpperCase();
-            loadAdminPanel();
+            fetchNews();
         }
 
-        async function loadAdminPanel() { /* same as before */ }
-        function renderAdmin(users, assets) { /* same */ }
-        function openAddAsset(userId) { /* same */ }
-        function openEditAsset(assetId, userId, symbol, qty) { /* same */ }
-        function deleteAsset(assetId) { /* same */ }
+        async function fetchNews() {
+            const container = document.getElementById('news-container');
+            container.innerHTML = '<p class="loading-text">Loading latest news...</p>';
+            const rssUrl = 'https://www.coindesk.com/arc/outboundfeeds/rss/';
+            const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error('Failed to fetch news');
+                const data = await response.json();
+                if (data.status === 'ok' && data.items && data.items.length > 0) {
+                    renderNews(data.items.slice(0, 15));
+                } else {
+                    container.innerHTML = '<p class="loading-text">No articles found.</p>';
+                }
+            } catch (error) {
+                container.innerHTML = '<p class="loading-text" style="color:var(--trade-red)">Unable to load news. Please try again later.</p>';
+            }
+        }
+
+        function renderNews(items) {
+            const container = document.getElementById('news-container');
+            let html = '';
+            items.forEach(item => {
+                const desc = item.description.replace(/<[^>]*>?/gm, '').substring(0, 200) + '...';
+                const pubDate = new Date(item.pubDate).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+                html += `<div class="news-item">
+                    <a href="${item.link}" target="_blank" rel="noopener">
+                        <div class="news-title">${item.title}</div>
+                        <div class="news-meta"><span>📅 ${pubDate}</span><span>👤 ${item.author || 'CoinDesk'}</span></div>
+                        <div class="news-desc">${desc}</div>
+                    </a>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
 
         function logout() { supabaseClient.auth.signOut().then(() => window.location.href = './pl.html'); }
     </script>
