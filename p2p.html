@@ -1,39 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>EXNYA | P2P Trading</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Sora:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Sora:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* ---------- Bybit P2P Dark Theme ---------- */
         :root {
-            --bg-base: #0b0e11;
-            --bg-elevated: #1e2329;
-            --bg-hover: #2a2f36;
-            --brand-yellow: #f0b90b;
-            --brand-yellow-dim: rgba(240, 185, 11, 0.1);
-            --text-primary: #eaecef;
-            --text-secondary: #848e9c;
-            --text-muted: #5e6673;
-            --border-light: #2b3139;
-            --border-subtle: #1e2329;
+            --bg-base: #080b0f;
+            --bg-elevated: #0d1117;
+            --bg-hover: #161c25;
+            --brand-yellow: #fcd535;
+            --brand-yellow-dim: rgba(252,213,53,0.08);
+            --text-primary: #e6e9ef;
+            --text-secondary: #5e6a7a;
+            --text-muted: #3a4554;
+            --border-light: #1e2733;
+            --border-subtle: #151d27;
             --trade-green: #0ecb81;
             --trade-red: #f6465d;
             --sidebar-width: 240px;
-            --sidebar-collapsed-width: 64px;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
             background: var(--bg-base);
             color: var(--text-primary);
@@ -41,9 +30,7 @@
             min-height: 100vh;
             font-family: 'DM Sans', sans-serif;
             font-size: 14px;
-            -webkit-font-smoothing: antialiased;
         }
-
         #particle-canvas {
             position: fixed;
             top: 0;
@@ -52,66 +39,40 @@
             height: 100%;
             z-index: 0;
             pointer-events: none;
-            opacity: 0.3;
+            opacity: 0.45;
         }
-
         .app-container {
             position: relative;
             z-index: 1;
             display: flex;
             width: 100%;
         }
-
-        /* ---------- Sidebar (same as all pages) ---------- */
         .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
             width: var(--sidebar-width);
             background: var(--bg-elevated);
             border-right: 1px solid var(--border-light);
-            display: flex;
-            flex-direction: column;
-            transition: width 0.3s;
-            overflow: hidden;
-            white-space: nowrap;
-            flex-shrink: 0;
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+            z-index: 100;
+            overflow-y: auto;
         }
-
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed-width);
-        }
-
+        .sidebar.open { transform: translateX(0); }
+        @media (min-width: 768px) { .sidebar { transform: translateX(0); position: relative; } }
         .sidebar-toggle {
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
-            padding: 22px 0 18px;
+            padding: 16px 0;
             cursor: pointer;
             color: var(--text-muted);
             border-bottom: 1px solid var(--border-light);
         }
-
-        .sidebar-toggle svg {
-            width: 18px;
-            height: 18px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 1.8;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .sidebar-toggle:hover {
-            color: var(--brand-yellow);
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            padding: 16px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
+        .sidebar-nav { flex:1; padding: 16px 10px; display: flex; flex-direction: column; gap: 2px; }
         .sidebar-nav a {
             display: flex;
             align-items: center;
@@ -122,54 +83,9 @@
             text-decoration: none;
             font-size: 13.5px;
             font-weight: 500;
-            transition: background 0.15s, color 0.15s;
-            white-space: nowrap;
         }
-
-        .sidebar.collapsed .sidebar-nav a {
-            padding: 12px 0;
-            justify-content: center;
-            gap: 0;
-        }
-
-        .sidebar.collapsed .sidebar-nav a .nav-text {
-            display: none;
-        }
-
-        .sidebar.collapsed .sidebar-nav a .nav-icon svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .sidebar-nav a:hover,
-        .sidebar-nav a.active {
-            background: var(--brand-yellow-dim);
-            color: var(--brand-yellow);
-        }
-
-        .sidebar-nav a .nav-icon {
-            display: flex;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .sidebar-nav a .nav-icon svg {
-            width: 16px;
-            height: 16px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 1.8;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .sidebar-footer {
-            padding: 12px 10px;
-            border-top: 1px solid var(--border-light);
-        }
-
+        .sidebar-nav a.active { background: var(--brand-yellow-dim); color: var(--brand-yellow); }
         .mobile-toggle {
-            display: none;
             position: fixed;
             top: 14px;
             left: 14px;
@@ -179,82 +95,31 @@
             background: var(--bg-elevated);
             border: 1px solid var(--border-light);
             border-radius: 7px;
-            color: var(--text-secondary);
-            cursor: pointer;
+            display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
         }
-
-        .mobile-toggle:hover {
-            color: var(--brand-yellow);
-            border-color: var(--brand-yellow);
-        }
-
-        @media (max-width:768px) {
-            .sidebar {
-                position: fixed;
-                left: 0;
-                top: 0;
-                bottom: 0;
-                z-index: 100;
-                box-shadow: 8px 0 32px rgba(0, 0, 0, 0.6);
-            }
-
-            .sidebar.collapsed {
-                width: 0;
-            }
-
-            .mobile-toggle {
-                display: flex;
-            }
-
-            .sidebar:not(.collapsed)~.mobile-toggle {
-                display: none;
-            }
-
-            .main-content {
-                padding: 20px 16px;
-            }
-        }
-
-        /* ---------- Main Content ---------- */
+        @media (min-width: 768px) { .mobile-toggle { display: none; } }
         .main-content {
             flex: 1;
-            padding: 28px 32px;
-            overflow-y: auto;
-            max-width: 1400px;
+            padding: 70px 16px 20px;
+            max-width: 100%;
         }
-
+        @media (min-width: 768px) { .main-content { padding: 28px 32px; max-width: 1400px; } }
         .top-bar {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 32px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .left-group {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 16px;
-        }
-
-        .top-logo {
-            height: 34px;
-            width: auto;
-        }
-
-        .user-info-row {
-            display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 12px;
+            margin-bottom: 24px;
         }
-
+        .top-logo { height: 30px; width: auto; }
+        .user-info-row { display: flex; align-items: center; gap: 12px; }
         .avatar {
-            width: 42px;
-            height: 42px;
+            width: 40px;
+            height: 40px;
             border-radius: 10px;
             background: linear-gradient(135deg, var(--brand-yellow) 0%, #c9920a 100%);
             display: flex;
@@ -262,595 +127,235 @@
             justify-content: center;
             font-family: 'Sora', sans-serif;
             font-weight: 700;
-            font-size: 17px;
+            font-size: 16px;
             color: #000;
-            flex-shrink: 0;
         }
-
-        .user-text {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .profile-name {
-            font-family: 'Sora', sans-serif;
-            font-weight: 600;
-            font-size: 15px;
-            color: var(--text-primary);
-        }
-
-        .user-email {
-            color: var(--text-secondary);
-            font-size: 12px;
-        }
-
-        .right-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding-top: 4px;
-        }
-
+        .user-text { display: flex; flex-direction: column; gap: 2px; }
+        .profile-name { font-weight: 600; font-size: 14px; }
+        .user-email { font-size: 11px; color: var(--text-secondary); }
         .logout-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
             background: transparent;
             border: 1px solid var(--border-light);
             color: var(--text-secondary);
-            padding: 7px 16px;
+            padding: 6px 14px;
             border-radius: 7px;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: border-color 0.2s, color 0.2s;
         }
-
-        .logout-btn svg {
-            width: 13px;
-            height: 13px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .logout-btn:hover {
-            border-color: var(--trade-red);
-            color: var(--trade-red);
-        }
-
-        /* ---------- P2P Specific Styles ---------- */
-        .p2p-container {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .p2p-header {
+        .p2p-header h1 { font-family: 'Sora', sans-serif; font-size: 24px; margin-bottom: 8px; }
+        .p2p-sub {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
-
-        .p2p-header h1 {
-            font-family: 'Sora', sans-serif;
-            font-size: 24px;
-            font-weight: 700;
+        .warning-badge {
+            background: rgba(246,70,93,0.12);
+            border: 1px solid rgba(246,70,93,0.2);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 11px;
+            color: #f97387;
         }
-
         .tabs {
             display: flex;
-            gap: 8px;
-            background: var(--bg-elevated);
-            padding: 4px;
-            border-radius: 8px;
-            width: fit-content;
+            gap: 4px;
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 20px;
+            overflow-x: auto;
         }
-
         .tab {
-            padding: 10px 24px;
             background: transparent;
             border: none;
-            border-radius: 6px;
-            cursor: pointer;
+            padding: 10px 16px;
             font-weight: 600;
             font-size: 14px;
             color: var(--text-secondary);
-            transition: all 0.2s;
+            cursor: pointer;
+            white-space: nowrap;
         }
-
-        .tab.active {
-            background: var(--brand-yellow-dim);
-            color: var(--brand-yellow);
-        }
-
-        .tab:hover {
-            color: var(--text-primary);
-        }
-
+        .tab.active { color: var(--brand-yellow); border-bottom: 2px solid var(--brand-yellow); }
         .filter-bar {
             display: flex;
-            gap: 12px;
             flex-wrap: wrap;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .filter-bar select,
-        .filter-bar input {
+            gap: 8px;
+            margin-bottom: 20px;
             background: var(--bg-elevated);
+            padding: 12px;
+            border-radius: 12px;
+        }
+        .filter-select, .filter-input {
+            background: var(--bg-base);
             border: 1px solid var(--border-light);
-            border-radius: 6px;
-            padding: 10px 14px;
+            border-radius: 8px;
+            padding: 8px 12px;
             color: var(--text-primary);
             font-size: 13px;
             outline: none;
-            font-family: 'DM Sans', sans-serif;
         }
-
-        .filter-bar select:focus,
-        .filter-bar input:focus {
-            border-color: var(--brand-yellow);
-        }
-
-        .filter-bar .btn {
-            padding: 10px 20px;
+        .btn-primary {
+            background: var(--brand-yellow);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
             font-weight: 600;
+            cursor: pointer;
         }
-
-        .ad-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .ad-item {
+        .order-card {
             background: var(--bg-elevated);
             border: 1px solid var(--border-light);
-            border-radius: 8px;
-            padding: 16px 20px;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
             flex-wrap: wrap;
-            gap: 12px;
-            transition: background 0.2s;
-        }
-
-        .ad-item:hover {
-            background: var(--bg-hover);
-        }
-
-        .ad-left {
-            display: flex;
             align-items: center;
-            gap: 16px;
-            flex: 1;
-            min-width: 0;
+            justify-content: space-between;
+            gap: 12px;
         }
-
-        .ad-avatar {
-            width: 40px;
-            height: 40px;
+        .merchant-info { display: flex; align-items: center; gap: 12px; min-width: 160px; }
+        .merchant-avatar {
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             background: var(--brand-yellow-dim);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
+            font-size: 18px;
             color: var(--brand-yellow);
-            flex-shrink: 0;
         }
-
-        .ad-user-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .ad-username {
-            font-weight: 600;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .merchant-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--brand-yellow), #c9920a);
-            color: #000;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 1px 6px;
-            border-radius: 4px;
-        }
-
-        .ad-stats {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        .ad-price {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--brand-yellow);
-            white-space: nowrap;
-        }
-
-        .ad-middle {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .ad-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 0.05em;
-        }
-
-        .ad-value {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-        }
-
-        .ad-value.available {
-            color: var(--trade-green);
-        }
-
-        .ad-value.limit {
-            color: var(--text-secondary);
-        }
-
-        .ad-right {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .ad-payment {
-            background: var(--bg-hover);
-            padding: 6px 12px;
-            border-radius: 4px;
+        .merchant-name { font-weight: 700; font-size: 15px; }
+        .merchant-stats { font-size: 11px; color: var(--text-secondary); }
+        .order-price { font-family: monospace; font-size: 20px; font-weight: 700; color: var(--brand-yellow); }
+        .order-limits, .order-amount { font-size: 12px; color: var(--text-secondary); }
+        .payment-method {
+            background: var(--bg-base);
+            padding: 4px 10px;
+            border-radius: 20px;
             font-size: 12px;
-            color: var(--text-secondary);
         }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-primary {
+        .action-btn {
             background: var(--brand-yellow);
             color: #000;
-        }
-
-        .btn-primary:hover {
-            background: #e6a800;
-        }
-
-        .btn-danger {
-            background: var(--trade-red);
-            color: #fff;
-        }
-
-        .btn-danger:hover {
-            background: #e03e50;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border-light);
-            color: var(--text-secondary);
-        }
-
-        .btn-outline:hover {
-            border-color: var(--brand-yellow);
-            color: var(--text-primary);
-        }
-
-        .btn-success {
-            background: var(--trade-green);
-            color: #000;
-        }
-
-        .btn-success:hover {
-            background: #0bb76e;
-        }
-
-        .kyc-warning {
-            background: rgba(246, 70, 93, 0.1);
-            border: 1px solid rgba(246, 70, 93, 0.2);
+            border: none;
+            padding: 6px 20px;
             border-radius: 8px;
-            padding: 12px 16px;
-            color: var(--trade-red);
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-weight: 700;
+            cursor: pointer;
         }
-
-        .kyc-warning a {
-            color: var(--brand-yellow);
-            font-weight: 600;
-        }
-
+        .action-btn.small { padding: 4px 12px; font-size: 12px; }
         .status-badge {
             padding: 2px 8px;
-            border-radius: 4px;
+            border-radius: 12px;
             font-size: 11px;
             font-weight: 600;
-            text-transform: uppercase;
         }
-
-        .status-open {
-            background: rgba(14, 203, 129, 0.1);
-            color: var(--trade-green);
-        }
-
-        .status-matched {
-            background: rgba(240, 185, 11, 0.1);
-            color: var(--brand-yellow);
-        }
-
-        .status-escrowed {
-            background: rgba(240, 185, 11, 0.15);
-            color: var(--brand-yellow);
-        }
-
-        .status-paid {
-            background: rgba(14, 203, 129, 0.15);
-            color: var(--trade-green);
-        }
-
-        .status-completed {
-            background: rgba(14, 203, 129, 0.2);
-            color: var(--trade-green);
-        }
-
-        .status-disputed {
-            background: rgba(246, 70, 93, 0.15);
-            color: var(--trade-red);
-        }
-
-        .status-cancelled {
-            background: rgba(132, 142, 156, 0.1);
-            color: var(--text-muted);
-        }
-
+        .status-open { background: rgba(14,203,129,0.1); color: var(--trade-green); }
+        .status-matched { background: rgba(252,213,53,0.1); color: var(--brand-yellow); }
+        .status-escrowed { background: rgba(252,213,53,0.15); color: var(--brand-yellow); }
+        .status-paid { background: rgba(14,203,129,0.15); color: var(--trade-green); }
+        .status-completed { background: rgba(14,203,129,0.2); color: var(--trade-green); }
+        .status-disputed { background: rgba(246,70,93,0.15); color: var(--trade-red); }
+        .status-cancelled { background: rgba(132,142,156,0.1); color: var(--text-muted); }
         .create-form {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-width: 420px;
             background: var(--bg-elevated);
-            padding: 24px;
-            border-radius: 8px;
-            border: 1px solid var(--border-light);
+            padding: 20px;
+            border-radius: 16px;
+            max-width: 500px;
         }
-
-        .create-form h3 {
-            font-family: 'Sora', sans-serif;
-            margin-bottom: 8px;
-        }
-
-        .create-form select,
-        .create-form input {
+        .create-form input, .create-form select {
+            width: 100%;
             background: var(--bg-base);
             border: 1px solid var(--border-light);
-            border-radius: 6px;
-            padding: 12px 14px;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 12px;
             color: var(--text-primary);
-            font-size: 14px;
-            outline: none;
-            font-family: 'DM Sans', sans-serif;
         }
-
-        .create-form input:focus,
-        .create-form select:focus {
-            border-color: var(--brand-yellow);
-        }
-
-        .create-form .row {
-            display: flex;
-            gap: 12px;
-        }
-
-        .create-form .row>* {
-            flex: 1;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-light);
-            border-radius: 12px;
-            padding: 28px 24px;
-            width: 90%;
-            max-width: 420px;
-            text-align: center;
-        }
-
-        .modal h3 {
-            font-family: 'Sora', sans-serif;
-            font-size: 18px;
+        .kyc-warning {
+            background: rgba(246,70,93,0.1);
+            border-left: 3px solid var(--trade-red);
+            padding: 10px;
+            border-radius: 8px;
             margin-bottom: 16px;
+            font-size: 12px;
         }
-
-        .modal p {
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin-bottom: 24px;
-            line-height: 1.6;
-        }
-
-        .modal .btn-row {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
+        .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+        @media (max-width: 700px) { .order-card { flex-direction: column; align-items: stretch; } .merchant-info { justify-content: space-between; } }
     </style>
 </head>
-
 <body>
     <canvas id="particle-canvas"></canvas>
     <div class="app-container">
-        <!-- Sidebar (identical to all other pages) -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-toggle" onclick="toggleSidebar()"><svg viewBox="0 0 24 24">
-                    <line x1="3" y1="6" x2="21" y2="6" />
-                    <line x1="3" y1="12" x2="21" y2="12" />
-                    <line x1="3" y1="18" x2="21" y2="18" />
-                </svg></div>
+            <div class="sidebar-toggle" onclick="toggleSidebar()"><svg viewBox="0 0 24 24" width="18" height="18"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
             <nav class="sidebar-nav">
-                <a href="./profile.html"><span class="nav-icon"><svg viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="7" height="7" rx="1" />
-                            <rect x="14" y="3" width="7" height="7" rx="1" />
-                            <rect x="3" y="14" width="7" height="7" rx="1" />
-                            <rect x="14" y="14" width="7" height="7" rx="1" />
-                        </svg></span><span class="nav-text">Overview</span></a>
-                <a href="./wallet.html"><span class="nav-icon"><svg viewBox="0 0 24 24">
-                            <rect x="2" y="4" width="20" height="16" rx="2" />
-                            <path d="M12 9v4M10 11h4" />
-                        </svg></span><span class="nav-text">Wallet</span></a>
-                <a href="./live-portfolio.html"><span class="nav-icon"><svg viewBox="0 0 24 24">
-                            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-                            <polyline points="16 7 22 7 22 13" />
-                        </svg></span><span class="nav-text">Live Portfolio</span></a>
-                <a href="./markets.html"><span class="nav-icon"><svg viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" />
-                            <line x1="2" y1="12" x2="22" y2="12" />
-                            <path
-                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                        </svg></span><span class="nav-text">Markets</span></a>
-                <a href="./swap.html"><span class="nav-icon"><svg viewBox="0 0 24 24">
-                            <polyline points="17 1 21 5 17 9" />
-                            <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-                            <polyline points="7 23 3 19 7 15" />
-                            <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-                        </svg></span><span class="nav-text">Swap</span></a>
-                <a href="./news.html"><span class="nav-icon"><svg viewBox="0 0 24 24">
-                            <path d="M4 11a9 9 0 0 1 9 9" />
-                            <path d="M4 4a16 16 0 0 1 16 16" />
-                            <circle cx="5" cy="19" r="1" />
-                        </svg></span><span class="nav-text">News</span></a>
-                <a href="./security.html"><span class="nav-icon"><svg viewBox="0 0 24 24">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                        </svg></span><span class="nav-text">Security</span></a>
-                <a href="./p2p.html" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24">
-                            <path d="M16 17l-4 4-4-4M12 3v18" />
-                        </svg></span><span class="nav-text">P2P</span></a>
+                <a href="./profile.html">Overview</a>
+                <a href="./wallet.html">Wallet</a>
+                <a href="./live-portfolio.html">Live Portfolio</a>
+                <a href="./markets.html">Markets</a>
+                <a href="./swap.html">Swap</a>
+                <a href="./news.html">News</a>
+                <a href="./security.html">Security</a>
+                <a href="#" class="active">P2P</a>
             </nav>
-            <div class="sidebar-footer"></div>
         </aside>
-        <div class="mobile-toggle" id="mobile-toggle" onclick="toggleSidebar()"><svg width="18" height="18"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-            </svg></div>
+        <div class="mobile-toggle" id="mobile-toggle" onclick="toggleSidebar()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
 
-        <!-- P2P Main Content -->
         <main class="main-content">
             <div class="top-bar">
-                <div class="left-group">
-                    <img class="top-logo" src="./WhatsApp%20Image%202026-04-03%20at%204.24.59%20AM.jpeg" alt="EXNYA">
-                    <div class="user-info-row">
-                        <div class="avatar" id="user-initials">U</div>
-                        <div class="user-text">
-                            <div class="profile-name" id="user-fullname">Loading...</div>
-                            <div class="user-email" id="user-email-display">--</div>
-                        </div>
+                <img class="top-logo" src="https://placehold.co/120x40?text=EXNYA" alt="EXNYA">
+                <div class="user-info-row">
+                    <div class="avatar" id="user-initials">U</div>
+                    <div class="user-text">
+                        <div class="profile-name" id="user-fullname">Loading...</div>
+                        <div class="user-email" id="user-email-display">--</div>
                     </div>
                 </div>
-                <div class="right-group">
-                    <button class="logout-btn" onclick="logout()"><svg viewBox="0 0 24 24">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                            <polyline points="16 17 21 12 16 7" />
-                            <line x1="21" y1="12" x2="9" y2="12" />
-                        </svg> Sign Out</button>
+                <button class="logout-btn" onclick="logout()">Sign Out</button>
+            </div>
+
+            <div class="p2p-header">
+                <h1>Express P2P Block Trade</h1>
+                <div class="p2p-sub">
+                    <span class="warning-badge">⚠️ Stay vigilant. Trade only within platform.</span>
+                    <span style="color:var(--brand-yellow);">Africa exclusive · NGN Liquidity Boost</span>
                 </div>
             </div>
 
-            <div class="p2p-container">
-                <div class="p2p-header">
-                    <h1>P2P Trading</h1>
-                    <div class="tabs" id="tabs">
-                        <button class="tab active" onclick="switchTab('buy')">Buy</button>
-                        <button class="tab" onclick="switchTab('sell')">Sell</button>
-                        <button class="tab" onclick="switchTab('my-orders')">My Orders</button>
-                        <button class="tab" onclick="switchTab('create')">Create Ad</button>
-                    </div>
-                </div>
-
-                <div id="kyc-warning" class="kyc-warning" style="display:none;">
-                    ⚠️ You must complete identity verification to trade. <a href="./profile.html">Verify now</a>
-                </div>
-
-                <!-- Filter bar (visible on Buy/Sell tabs) -->
-                <div id="filter-bar" class="filter-bar" style="display:none;">
-                    <select id="filter-coin">
-                        <option value="">All Coins</option>
-                        <option value="BTC">BTC</option>
-                        <option value="ETH">ETH</option>
-                        <option value="USDT">USDT</option>
-                    </select>
-                    <select id="filter-payment">
-                        <option value="">All Payments</option>
-                        <option value="Bank Transfer (NGN)">Bank Transfer</option>
-                        <option value="Mobile Money">Mobile Money</option>
-                        <option value="PayPal">PayPal</option>
-                    </select>
-                    <input type="number" id="filter-amount" placeholder="Min amount (USD)" style="width:140px;">
-                    <button class="btn btn-primary" onclick="applyFilters()">Search</button>
-                </div>
-
-                <div id="tab-content"><!-- dynamic --></div>
+            <div class="tabs" id="p2p-tabs">
+                <button class="tab active" data-tab="buy">Buy</button>
+                <button class="tab" data-tab="sell">Sell</button>
+                <button class="tab" data-tab="orders">My Orders</button>
+                <button class="tab" data-tab="ads">Create Ad</button>
             </div>
+
+            <div id="kyc-warning" class="kyc-warning" style="display:none;">
+                ⚠️ You must complete identity verification to trade. <a href="./profile.html" style="color:var(--brand-yellow);">Verify now</a>
+            </div>
+
+            <div id="filter-bar" class="filter-bar">
+                <select id="filter-asset" class="filter-select">
+                    <option value="USDT">USDT</option>
+                    <option value="BTC">BTC</option>
+                    <option value="ETH">ETH</option>
+                </select>
+                <input type="number" id="filter-amount" class="filter-input" placeholder="Min amount (NGN)">
+                <select id="filter-payment" class="filter-select">
+                    <option value="">All Payments</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="Opay">Opay</option>
+                    <option value="PalmPay">PalmPay</option>
+                </select>
+                <button class="btn-primary" onclick="applyFilters()">Search</button>
+            </div>
+
+            <div id="tab-content"></div>
         </main>
-    </div>
-
-    <!-- Confirm Trade Modal -->
-    <div class="modal-overlay" id="trade-modal">
-        <div class="modal">
-            <h3>Confirm Trade</h3>
-            <p id="trade-details"></p>
-            <div class="btn-row">
-                <button class="btn btn-outline" onclick="closeTradeModal()">Cancel</button>
-                <button class="btn btn-primary" id="confirm-trade-btn">Confirm</button>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -859,252 +364,408 @@
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;
-        let currentProfile = null;
+        let currentProfile = { kyc_status: 'unverified', completed_trades_count: 0, merchant: false, first_name: '' };
         let currentTab = 'buy';
         let allTrades = [];
-        let userProfiles = {};
+        let myTrades = [];
+        let userCache = {};           // stores profile info for any user id
+        let counterpartyNames = {};   // for myTrades: trade id -> counterparty name
 
-        // Sidebar & particles (minimal)
-        const sidebar = document.getElementById('sidebar');
-        if (localStorage.getItem('sidebarCollapsed') === 'true') sidebar.classList.add('collapsed');
-        function toggleSidebar() { sidebar.classList.toggle('collapsed'); localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed')); }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+        // Particle background (lightweight)
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
-        let particlesArray = []; const numParticles = 60;
-        function setCanvasSize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        setCanvasSize(); window.addEventListener('resize', setCanvasSize);
+        let particles = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
         class Particle {
-            constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 1.5 + 0.2; this.speedX = (Math.random() * 0.4) - 0.2; this.speedY = (Math.random() * 0.4) - 0.2; }
-            update() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0) this.x = canvas.width; if (this.x > canvas.width) this.x = 0; if (this.y < 0) this.y = canvas.height; if (this.y > canvas.height) this.y = 0; }
-            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = '#D4AF37'; ctx.shadowBlur = 6; ctx.shadowColor = '#D4AF37'; ctx.fill(); }
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.3;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = '#D4AF37';
+                ctx.fill();
+            }
         }
-        function initParticles() { particlesArray = []; for (let i = 0; i < numParticles; i++) particlesArray.push(new Particle()); }
-        function animateParticles() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); for (let j = i + 1; j < particlesArray.length; j++) { const dx = particlesArray[i].x - particlesArray[j].x; const dy = particlesArray[i].y - particlesArray[j].y; const distance = Math.sqrt(dx * dx + dy * dy); if (distance < 110) { ctx.beginPath(); ctx.strokeStyle = `rgba(212,175,55,${0.1 - distance / 700})`; ctx.lineWidth = 0.4; ctx.shadowBlur = 0; ctx.moveTo(particlesArray[i].x, particlesArray[i].y); ctx.lineTo(particlesArray[j].x, particlesArray[j].y); ctx.stroke(); } } } requestAnimationFrame(animateParticles); }
-        initParticles(); animateParticles();
+        for (let i = 0; i < 60; i++) particles.push(new Particle());
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
 
         async function init() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) { window.location.href = './pl.html'; return; }
-            currentUser = session.user;
-            document.getElementById('user-initials').textContent = (currentUser.email[0] || 'U').toUpperCase();
-            document.getElementById('user-fullname').textContent = currentUser.email;
-            document.getElementById('user-email-display').textContent = currentUser.email;
+            try {
+                const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+                if (sessionError) throw sessionError;
+                if (!session) { window.location.href = './pl.html'; return; }
+                currentUser = session.user;
 
-            const { data: profile } = await supabaseClient.from('profiles').select('kyc_status,merchant,completed_trades_count,first_name').eq('id', currentUser.id).single();
-            currentProfile = profile || { kyc_status: 'unverified', merchant: false, completed_trades_count: 0 };
+                const { data: profile, error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .select('kyc_status, merchant, completed_trades_count, first_name')
+                    .eq('id', currentUser.id)
+                    .maybeSingle();
+                if (profileError) console.warn(profileError);
+                if (profile) currentProfile = { ...currentProfile, ...profile };
+                
+                // Set display name: use first_name if available, otherwise email username
+                const displayName = currentProfile.first_name || currentUser.email.split('@')[0];
+                document.getElementById('user-fullname').textContent = displayName;
+                document.getElementById('user-email-display').textContent = currentUser.email;
+                document.getElementById('user-initials').textContent = (currentProfile.first_name ? currentProfile.first_name[0] : currentUser.email[0]).toUpperCase();
+                
+                if (currentProfile.kyc_status !== 'verified') {
+                    document.getElementById('kyc-warning').style.display = 'block';
+                }
 
-            if (currentProfile.kyc_status !== 'verified') {
-                document.getElementById('kyc-warning').style.display = 'flex';
+                await loadData();
+                renderTab();
+            } catch (err) {
+                console.error('Init error:', err);
+                document.getElementById('tab-content').innerHTML = '<div class="empty-state">Error loading page. Please refresh.</div>';
             }
+        }
 
-            await loadTrades();
+        async function loadData() {
+            try {
+                // Load open ads
+                const { data: openAds, error: adsError } = await supabaseClient
+                    .from('p2p_trades')
+                    .select('*')
+                    .eq('status', 'open')
+                    .order('created_at', { ascending: false });
+                if (adsError) throw adsError;
+                allTrades = openAds || [];
+
+                // Load user's involved trades
+                const { data: involved, error: invError } = await supabaseClient
+                    .from('p2p_trades')
+                    .select('*')
+                    .or(`user_id.eq.${currentUser.id},matched_user_id.eq.${currentUser.id}`)
+                    .order('created_at', { ascending: false });
+                if (invError) throw invError;
+                myTrades = involved || [];
+
+                // Cache profiles for ad owners (for buy/sell tabs)
+                const adOwnerIds = [...new Set(allTrades.map(t => t.user_id))];
+                // Also cache counterparties for myTrades
+                const counterpartyIds = [];
+                for (const trade of myTrades) {
+                    const otherId = trade.user_id === currentUser.id ? trade.matched_user_id : trade.user_id;
+                    if (otherId) counterpartyIds.push(otherId);
+                }
+                const allUserIds = [...new Set([...adOwnerIds, ...counterpartyIds])];
+                if (allUserIds.length) {
+                    const { data: profiles } = await supabaseClient
+                        .from('profiles')
+                        .select('id, first_name, merchant, completed_trades_count')
+                        .in('id', allUserIds);
+                    if (profiles) {
+                        profiles.forEach(p => { userCache[p.id] = p; });
+                    }
+                }
+
+                // Prebuild counterparty names map for myTrades
+                counterpartyNames = {};
+                for (const trade of myTrades) {
+                    const otherId = trade.user_id === currentUser.id ? trade.matched_user_id : trade.user_id;
+                    if (otherId && userCache[otherId]) {
+                        counterpartyNames[trade.id] = userCache[otherId].first_name || 'User';
+                    } else if (otherId) {
+                        counterpartyNames[trade.id] = 'User';
+                    } else {
+                        counterpartyNames[trade.id] = 'Unknown';
+                    }
+                }
+            } catch (err) {
+                console.error('Load data error:', err);
+            }
+        }
+
+        async function applyFilters() { renderTab(); }
+
+        function renderTab() {
+            const container = document.getElementById('tab-content');
+            if (!container) return;
+
+            if (currentTab === 'buy') {
+                const asset = document.getElementById('filter-asset')?.value || 'USDT';
+                const minAmount = parseFloat(document.getElementById('filter-amount')?.value) || 0;
+                const payment = document.getElementById('filter-payment')?.value || '';
+
+                let ads = allTrades.filter(t => t.type === 'sell');
+                if (asset) ads = ads.filter(t => t.asset_symbol === asset);
+                if (payment) ads = ads.filter(t => t.payment_method === payment);
+                if (minAmount > 0) ads = ads.filter(t => parseFloat(t.amount) >= minAmount);
+
+                if (ads.length === 0) {
+                    container.innerHTML = `<div class="empty-state">No buy offers found.<br><button class="btn-primary" onclick="switchTab('ads')" style="margin-top:12px;">Create an ad</button></div>`;
+                    return;
+                }
+
+                let html = '';
+                ads.forEach(ad => {
+                    const owner = userCache[ad.user_id] || { first_name: 'User', merchant: false, completed_trades_count: 0 };
+                    const name = owner.first_name || 'User';
+                    const merchant = owner.merchant ? '⭐' : '';
+                    const tradesCount = owner.completed_trades_count || 0;
+                    const completion = tradesCount > 0 ? Math.min(99, Math.floor((tradesCount / (tradesCount+1)) * 100)) : 85;
+                    const priceNgn = (parseFloat(ad.price) * 1550).toFixed(2);
+                    html += `
+                        <div class="order-card">
+                            <div class="merchant-info">
+                                <div class="merchant-avatar">${name.charAt(0).toUpperCase()}</div>
+                                <div>
+                                    <div class="merchant-name">${name} ${merchant}</div>
+                                    <div class="merchant-stats">${tradesCount} orders (${completion}%)</div>
+                                </div>
+                            </div>
+                            <div class="order-price">₦${priceNgn}</div>
+                            <div>
+                                <div class="order-limits">Limits: ${parseFloat(ad.amount).toFixed(2)} - ${(parseFloat(ad.amount)*1.5).toFixed(2)} NGN</div>
+                                <div class="order-amount">Amount: ${ad.amount} ${ad.asset_symbol}</div>
+                            </div>
+                            <div class="payment-method">📋 ${ad.payment_method}</div>
+                            ${currentProfile.kyc_status === 'verified' && ad.user_id !== currentUser.id ? `<button class="action-btn" onclick="initiateTrade('${ad.id}')">Buy</button>` : (ad.user_id === currentUser.id ? '<span class="status-badge status-open">Your ad</span>' : '')}
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+            else if (currentTab === 'sell') {
+                const asset = document.getElementById('filter-asset')?.value || 'USDT';
+                const minAmount = parseFloat(document.getElementById('filter-amount')?.value) || 0;
+                const payment = document.getElementById('filter-payment')?.value || '';
+
+                let ads = allTrades.filter(t => t.type === 'buy');
+                if (asset) ads = ads.filter(t => t.asset_symbol === asset);
+                if (payment) ads = ads.filter(t => t.payment_method === payment);
+                if (minAmount > 0) ads = ads.filter(t => parseFloat(t.amount) >= minAmount);
+
+                if (ads.length === 0) {
+                    container.innerHTML = `<div class="empty-state">No sell offers found.</div>`;
+                    return;
+                }
+
+                let html = '';
+                ads.forEach(ad => {
+                    const owner = userCache[ad.user_id] || { first_name: 'User', merchant: false, completed_trades_count: 0 };
+                    const name = owner.first_name || 'User';
+                    const merchant = owner.merchant ? '⭐' : '';
+                    const tradesCount = owner.completed_trades_count || 0;
+                    const completion = tradesCount > 0 ? Math.min(99, Math.floor((tradesCount / (tradesCount+1)) * 100)) : 85;
+                    const priceNgn = (parseFloat(ad.price) * 1550).toFixed(2);
+                    html += `
+                        <div class="order-card">
+                            <div class="merchant-info">
+                                <div class="merchant-avatar">${name.charAt(0).toUpperCase()}</div>
+                                <div>
+                                    <div class="merchant-name">${name} ${merchant}</div>
+                                    <div class="merchant-stats">${tradesCount} orders (${completion}%)</div>
+                                </div>
+                            </div>
+                            <div class="order-price">₦${priceNgn}</div>
+                            <div>
+                                <div class="order-limits">Limits: ${parseFloat(ad.amount).toFixed(2)} - ${(parseFloat(ad.amount)*1.5).toFixed(2)} NGN</div>
+                                <div class="order-amount">Amount: ${ad.amount} ${ad.asset_symbol}</div>
+                            </div>
+                            <div class="payment-method">📋 ${ad.payment_method}</div>
+                            ${currentProfile.kyc_status === 'verified' && ad.user_id !== currentUser.id ? `<button class="action-btn" onclick="initiateTrade('${ad.id}')">Sell</button>` : (ad.user_id === currentUser.id ? '<span class="status-badge status-open">Your ad</span>' : '')}
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+            else if (currentTab === 'orders') {
+                if (myTrades.length === 0) {
+                    container.innerHTML = `<div class="empty-state">No orders yet.</div>`;
+                    return;
+                }
+                let html = '';
+                for (const trade of myTrades) {
+                    const isMaker = trade.user_id === currentUser.id;
+                    const otherName = counterpartyNames[trade.id] || 'Unknown';
+                    const statusClass = `status-${trade.status}`;
+                    let actions = '';
+                    if (trade.status === 'matched' && trade.user_id === currentUser.id) {
+                        actions = `<button class="action-btn small" onclick="updateTradeStatus('${trade.id}', 'escrowed')">Mark Escrowed</button>`;
+                    }
+                    if (trade.status === 'escrowed' && trade.matched_user_id === currentUser.id) {
+                        actions = `<button class="action-btn small" onclick="updateTradeStatus('${trade.id}', 'paid')">I've Paid</button>`;
+                    }
+                    if (trade.status === 'paid' && trade.user_id === currentUser.id) {
+                        actions = `<button class="action-btn small" onclick="updateTradeStatus('${trade.id}', 'completed')">Release Funds</button>`;
+                    }
+                    if (['matched', 'escrowed', 'paid'].includes(trade.status)) {
+                        actions += `<button class="action-btn small" style="background:#f97387; margin-left:6px;" onclick="updateTradeStatus('${trade.id}', 'disputed')">Dispute</button>`;
+                    }
+                    if (trade.status === 'open' && trade.user_id === currentUser.id) {
+                        actions = `<button class="action-btn small" onclick="cancelAd('${trade.id}')">Cancel Ad</button>`;
+                    }
+                    html += `
+                        <div class="order-card">
+                            <div><span class="status-badge ${statusClass}">${trade.status.toUpperCase()}</span></div>
+                            <div><strong>${trade.type.toUpperCase()} ${trade.amount} ${trade.asset_symbol}</strong> @ ₦${(trade.price * 1550).toFixed(2)}</div>
+                            <div>Payment: ${trade.payment_method}</div>
+                            <div>Counterparty: ${otherName}</div>
+                            <div>${actions}</div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+            }
+            else if (currentTab === 'ads') {
+                if (currentProfile.kyc_status !== 'verified') {
+                    container.innerHTML = `<div class="kyc-warning">Complete KYC to create ads.</div>`;
+                    return;
+                }
+                container.innerHTML = `
+                    <div class="create-form">
+                        <h3>Create New Ad</h3>
+                        <select id="ad-type"><option value="sell">Sell</option><option value="buy">Buy</option></select>
+                        <select id="ad-coin"><option value="USDT">USDT</option><option value="BTC">BTC</option><option value="ETH">ETH</option></select>
+                        <input type="number" id="ad-amount" placeholder="Amount (crypto)">
+                        <input type="number" id="ad-price" placeholder="Price per coin (USD)">
+                        <select id="ad-payment"><option value="Bank Transfer">Bank Transfer</option><option value="Opay">Opay</option><option value="PalmPay">PalmPay</option></select>
+                        <button class="btn-primary" onclick="createAd()" style="width:100%;">Post Ad</button>
+                    </div>
+                `;
+            }
+        }
+
+        async function initiateTrade(adId) {
+            if (currentProfile.kyc_status !== 'verified') {
+                alert('Please complete KYC verification first.');
+                return;
+            }
+            const ad = allTrades.find(t => t.id === adId);
+            if (!ad) { alert('Ad not found'); return; }
+            if (ad.user_id === currentUser.id) { alert('You cannot trade with your own ad.'); return; }
+            if (!confirm(`You are about to ${ad.type === 'sell' ? 'buy' : 'sell'} ${ad.amount} ${ad.asset_symbol} at ₦${(ad.price * 1550).toFixed(2)}. Proceed?`)) return;
+
+            const { error } = await supabaseClient
+                .from('p2p_trades')
+                .update({ matched_user_id: currentUser.id, status: 'matched' })
+                .eq('id', adId);
+            if (error) { alert('Failed to initiate trade: ' + error.message); return; }
+            alert('Trade initiated! Go to "My Orders" to continue.');
+            await loadData();
+            switchTab('orders');
+        }
+
+        async function updateTradeStatus(tradeId, newStatus) {
+            const { error } = await supabaseClient
+                .from('p2p_trades')
+                .update({ status: newStatus })
+                .eq('id', tradeId);
+            if (error) { alert('Error: ' + error.message); return; }
+            if (newStatus === 'completed') {
+                const trade = myTrades.find(t => t.id === tradeId);
+                if (trade) {
+                    for (const uid of [trade.user_id, trade.matched_user_id]) {
+                        if (!uid) continue;
+                        const { data: p } = await supabaseClient
+                            .from('profiles')
+                            .select('completed_trades_count')
+                            .eq('id', uid)
+                            .single();
+                        const newCount = (p?.completed_trades_count || 0) + 1;
+                        await supabaseClient
+                            .from('profiles')
+                            .update({ completed_trades_count: newCount, merchant: newCount >= 5 })
+                            .eq('id', uid);
+                        if (uid === currentUser.id) currentProfile.completed_trades_count = newCount;
+                    }
+                    alert('Trade completed! Funds released. Thank you.');
+                } else { alert('Trade completed.'); }
+            } else if (newStatus === 'paid') {
+                alert('Payment marked as sent. Waiting for seller to release funds.');
+            } else if (newStatus === 'escrowed') {
+                alert('Escrow simulation: funds are now held.');
+            } else if (newStatus === 'disputed') {
+                alert('Dispute raised. An admin will review.');
+            }
+            await loadData();
             renderTab();
         }
 
-        async function loadTrades() {
-            const { data, error } = await supabaseClient.from('p2p_trades').select('*').order('created_at', { ascending: false });
-            if (!error) allTrades = data;
+        async function cancelAd(adId) {
+            if (!confirm('Cancel this ad? It will be removed from listings.')) return;
+            const { error } = await supabaseClient
+                .from('p2p_trades')
+                .update({ status: 'cancelled' })
+                .eq('id', adId);
+            if (error) { alert('Error: ' + error.message); return; }
+            await loadData();
+            renderTab();
+        }
 
-            // Cache profiles for ad owners
-            const openAds = allTrades.filter(t => t.status === 'open');
-            const userIds = [...new Set(openAds.map(t => t.user_id))];
-            if (userIds.length > 0) {
-                const { data: profiles } = await supabaseClient.from('profiles').select('id,first_name,merchant,completed_trades_count').in('id', userIds);
-                if (profiles) profiles.forEach(p => userProfiles[p.id] = p);
+        async function createAd() {
+            const type = document.getElementById('ad-type').value;
+            const symbol = document.getElementById('ad-coin').value;
+            const amount = parseFloat(document.getElementById('ad-amount').value);
+            const price = parseFloat(document.getElementById('ad-price').value);
+            const payment = document.getElementById('ad-payment').value;
+            if (!amount || !price || amount <= 0 || price <= 0) {
+                alert('Enter valid amount and price.');
+                return;
             }
+            const total = amount * price;
+            const { error } = await supabaseClient.from('p2p_trades').insert({
+                user_id: currentUser.id,
+                type: type,
+                asset_symbol: symbol,
+                amount: amount,
+                price: price,
+                total: total,
+                payment_method: payment,
+                status: 'open'
+            });
+            if (error) { alert('Failed to create ad: ' + error.message); return; }
+            alert('Ad created successfully!');
+            await loadData();
+            switchTab(type === 'sell' ? 'buy' : 'sell');
         }
 
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
-
-            // Show/hide filter bar
-            document.getElementById('filter-bar').style.display = (tab === 'buy' || tab === 'sell') ? 'flex' : 'none';
+            const activeBtn = document.querySelector(`[data-tab="${tab}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+            const filterBar = document.getElementById('filter-bar');
+            if (filterBar) filterBar.style.display = (tab === 'buy' || tab === 'sell') ? 'flex' : 'none';
             renderTab();
         }
 
-        function applyFilters() {
-            renderTab(); // reload with current filters
+        function logout() {
+            supabaseClient.auth.signOut().then(() => window.location.href = './pl.html');
         }
 
-        function renderTab() {
-            const container = document.getElementById('tab-content');
-            if (currentTab === 'buy' || currentTab === 'sell') {
-                const filterType = currentTab;
-                const oppositeType = filterType === 'buy' ? 'sell' : 'buy';
-                const coinFilter = document.getElementById('filter-coin')?.value || '';
-                const paymentFilter = document.getElementById('filter-payment')?.value || '';
-                const minAmount = parseFloat(document.getElementById('filter-amount')?.value) || 0;
-
-                let ads = allTrades.filter(t => t.status === 'open' && t.type === oppositeType);
-                if (coinFilter) ads = ads.filter(t => t.asset_symbol === coinFilter);
-                if (paymentFilter) ads = ads.filter(t => t.payment_method === paymentFilter);
-                if (minAmount > 0) ads = ads.filter(t => parseFloat(t.amount) >= minAmount);
-
-                let html = '';
-                if (ads.length === 0) {
-                    html = `<p style="color:var(--text-muted); padding:32px; text-align:center;">No ${oppositeType} ads found. <button class="btn btn-primary" onclick="switchTab('create')">Create one</button></p>`;
-                } else {
-                    ads.forEach(ad => {
-                        const owner = userProfiles[ad.user_id] || {};
-                        const name = owner.first_name || 'User';
-                        const merchant = owner.merchant ? '<span class="merchant-badge">MERCHANT</span>' : '';
-                        const tradesCount = owner.completed_trades_count || 0;
-                        const isOwn = ad.user_id === currentUser.id;
-
-                        html += `
-                        <div class="ad-item">
-                            <div class="ad-left">
-                                <div class="ad-avatar">${name[0]?.toUpperCase()}</div>
-                                <div class="ad-user-info">
-                                    <div class="ad-username">${name} ${merchant}</div>
-                                    <div class="ad-stats">${tradesCount} trades</div>
-                                </div>
-                            </div>
-                            <div class="ad-price">$${parseFloat(ad.price).toFixed(2)}</div>
-                            <div class="ad-middle">
-                                <div class="ad-label">Available</div>
-                                <div class="ad-value available">${ad.amount} ${ad.asset_symbol}</div>
-                            </div>
-                            <div class="ad-middle">
-                                <div class="ad-label">Limit</div>
-                                <div class="ad-value limit">--</div>
-                            </div>
-                            <div class="ad-payment">${ad.payment_method}</div>
-                            <div class="ad-right">
-                                ${!isOwn && currentProfile.kyc_status === 'verified' ? `<button class="btn btn-primary" onclick="confirmTrade('${ad.id}')">${filterType === 'buy' ? 'Buy' : 'Sell'}</button>` : ''}
-                                ${isOwn ? `<button class="btn btn-outline" onclick="cancelTrade('${ad.id}')">Remove</button>` : ''}
-                            </div>
-                        </div>`;
-                    });
-                }
-                container.innerHTML = html;
-            } else if (currentTab === 'my-orders') {
-                const myTrades = allTrades.filter(t => t.user_id === currentUser.id || t.matched_user_id === currentUser.id);
-                let html = '';
-                if (myTrades.length === 0) {
-                    html = '<p style="color:var(--text-muted); padding:32px; text-align:center;">No orders yet.</p>';
-                } else {
-                    myTrades.forEach(trade => {
-                        const statusClass = `status-${trade.status}`;
-                        let actions = '';
-                        if (trade.status === 'matched' && trade.user_id === currentUser.id) {
-                            actions += `<button class="btn btn-primary" onclick="escrowTrade('${trade.id}')">Escrow</button>`;
-                        }
-                        if (trade.status === 'escrowed' && trade.matched_user_id === currentUser.id) {
-                            actions += `<button class="btn btn-success" onclick="confirmPayment('${trade.id}')">I've Paid</button>`;
-                        }
-                        if (trade.status === 'paid' && trade.user_id === currentUser.id) {
-                            actions += `<button class="btn btn-success" onclick="releaseTrade('${trade.id}')">Release</button>`;
-                        }
-                        if (['matched', 'escrowed', 'paid'].includes(trade.status)) {
-                            actions += `<button class="btn btn-danger" onclick="disputeTrade('${trade.id}')">Dispute</button>`;
-                        }
-                        if (trade.status === 'open' && trade.user_id === currentUser.id) {
-                            actions += `<button class="btn btn-outline" onclick="cancelTrade('${trade.id}')">Cancel</button>`;
-                        }
-                        html += `
-                        <div class="ad-item">
-                            <div style="display:flex;align-items:center;gap:12px;flex:1;">
-                                <span class="status-badge ${statusClass}">${trade.status}</span>
-                                <span style="font-weight:600;">${trade.type.toUpperCase()} ${trade.asset_symbol}</span>
-                                <span style="font-family:'JetBrains Mono';font-size:13px;">${trade.amount} @ $${trade.price}</span>
-                                <span style="color:var(--text-secondary);">${trade.payment_method}</span>
-                            </div>
-                            <div class="ad-right">${actions}</div>
-                        </div>`;
-                    });
-                }
-                container.innerHTML = html;
-            } else if (currentTab === 'create') {
-                if (currentProfile.kyc_status !== 'verified') {
-                    container.innerHTML = '<p style="color:var(--trade-red); padding:32px; text-align:center;">Complete KYC verification to create ads.</p>';
-                    return;
-                }
-                container.innerHTML = `
-                <div class="create-form">
-                    <h3>Create New Ad</h3>
-                    <select id="order-type"><option value="buy">Buy</option><option value="sell">Sell</option></select>
-                    <select id="order-coin"><option value="BTC">BTC</option><option value="ETH">ETH</option><option value="USDT">USDT</option></select>
-                    <div class="row">
-                        <input type="number" id="order-amount" placeholder="Amount" step="any">
-                        <input type="number" id="order-price" placeholder="Price per coin (USD)" step="any">
-                    </div>
-                    <select id="order-payment">
-                        <option value="Bank Transfer (NGN)">Bank Transfer (NGN)</option>
-                        <option value="Mobile Money">Mobile Money</option>
-                        <option value="PayPal">PayPal</option>
-                    </select>
-                    <button class="btn btn-primary" onclick="createOrder()" style="width:100%;">Post Ad</button>
-                </div>`;
-            }
-        }
-
-        async function confirmTrade(adId) {
-            const ad = allTrades.find(t => t.id === adId);
-            if (!ad) return;
-            document.getElementById('trade-details').innerHTML = `
-                <b>${ad.type.toUpperCase()} ${ad.amount} ${ad.asset_symbol}</b><br>
-                Price: $${parseFloat(ad.price).toFixed(2)}/coin<br>
-                Total: $${parseFloat(ad.total).toFixed(2)}<br>
-                Payment: ${ad.payment_method}
-            `;
-            document.getElementById('trade-modal').style.display = 'flex';
-            document.getElementById('confirm-trade-btn').onclick = async () => {
-                closeTradeModal();
-                await supabaseClient.from('p2p_trades').update({
-                    matched_user_id: currentUser.id,
-                    status: 'matched'
-                }).eq('id', adId);
-                await loadTrades();
-                renderTab();
-            };
-        }
-
-        function closeTradeModal() { document.getElementById('trade-modal').style.display = 'none'; }
-
-        async function createOrder() {
-            const type = document.getElementById('order-type').value;
-            const symbol = document.getElementById('order-coin').value;
-            const amount = parseFloat(document.getElementById('order-amount').value);
-            const price = parseFloat(document.getElementById('order-price').value);
-            const payment = document.getElementById('order-payment').value;
-            if (!amount || !price || amount <= 0 || price <= 0) { alert('Enter valid amount and price.'); return; }
-            const total = amount * price;
-            const { error } = await supabaseClient.from('p2p_trades').insert({
-                user_id: currentUser.id,
-                type, asset_symbol: symbol,
-                amount, price, total,
-                payment_method: payment,
-                status: 'open'
+        // Attach event listeners after DOM loads
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.tab').forEach(btn => {
+                btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
             });
-            if (error) alert('Failed to create ad: ' + error.message);
-            else { await loadTrades(); switchTab(type); }
-        }
-
-        async function escrowTrade(id) { await supabaseClient.from('p2p_trades').update({ status: 'escrowed' }).eq('id', id); await loadTrades(); renderTab(); }
-        async function confirmPayment(id) { await supabaseClient.from('p2p_trades').update({ status: 'paid' }).eq('id', id); await loadTrades(); renderTab(); }
-        async function releaseTrade(id) {
-            const trade = allTrades.find(t => t.id === id);
-            if (!trade) return;
-            await supabaseClient.from('p2p_trades').update({ status: 'completed' }).eq('id', id);
-            // Increment completed trades for both parties
-            for (const uid of [trade.user_id, trade.matched_user_id]) {
-                if (!uid) continue;
-                const { data: p } = await supabaseClient.from('profiles').select('completed_trades_count').eq('id', uid).single();
-                const newCount = (p?.completed_trades_count || 0) + 1;
-                await supabaseClient.from('profiles').update({ completed_trades_count: newCount, merchant: newCount >= 5 }).eq('id', uid);
-            }
-            await loadTrades(); renderTab();
-        }
-        async function disputeTrade(id) { await supabaseClient.from('p2p_trades').update({ status: 'disputed' }).eq('id', id); await loadTrades(); renderTab(); }
-        async function cancelTrade(id) { await supabaseClient.from('p2p_trades').update({ status: 'cancelled' }).eq('id', id); await loadTrades(); renderTab(); }
-
-        function logout() { supabaseClient.auth.signOut().then(() => window.location.href = './pl.html'); }
-
-        init();
+            init();
+        });
     </script>
 </body>
-
 </html>
