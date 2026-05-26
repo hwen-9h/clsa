@@ -45,6 +45,7 @@
         .status-verified{background:rgba(14,203,129,0.15);color:var(--trade-green);}
         .status-rejected{background:rgba(246,70,93,0.15);color:var(--trade-red);}
         .toast{position:fixed;bottom:20px;right:20px;background:var(--bg-elevated);border-left:4px solid var(--trade-green);padding:12px 20px;border-radius:8px;z-index:2000;display:none;max-width:90%;word-break:break-word;}
+        .error-banner{background:rgba(246,70,93,0.2);border:1px solid var(--trade-red);border-radius:8px;padding:12px;margin-bottom:16px;color:var(--trade-red);}
     </style>
 </head>
 <body>
@@ -61,16 +62,23 @@
                 <div class="user-info-row"><div class="avatar" id="user-initials">A</div><div class="user-text"><div class="profile-name" id="user-fullname">Admin</div><div class="user-email" id="user-email-display">--</div></div></div>
                 <button class="logout-btn" onclick="logout()">Sign Out</button>
             </div>
+            <div id="error-container"></div>
             <div class="card"><h2>Admin Panel</h2><div class="table-wrapper"><div id="admin-content">Loading...</div></div></div>
-            <div class="card">
-                <h2>KYC Verification Queue <button class="refresh-btn" onclick="loadKYCQueue(true)">⟳ Refresh</button></h2>
-                <div class="table-wrapper"><div id="kyc-queue">Loading...</div></div>
-            </div>
+            <div class="card"><h2>KYC Verification Queue <button class="refresh-btn" onclick="loadKYCQueue(true)">⟳ Refresh</button></h2><div class="table-wrapper"><div id="kyc-queue">Loading...</div></div></div>
         </main>
     </div>
     <div id="toast" class="toast"></div>
 
     <script>
+        // Suppress "message channel closed" errors from browser extensions
+        window.addEventListener('unhandledrejection', function(event) {
+            if (event.reason?.message?.includes('message channel closed') ||
+                event.reason?.message?.includes('Listener indicated an asynchronous response')) {
+                event.preventDefault();
+                return;
+            }
+        });
+
         const SUPABASE_URL = 'https://clwgengvcdokdzubdfxd.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsd2dlbmd2Y2Rva2R6dWJkZnhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTIxNjEsImV4cCI6MjA5MzQ4ODE2MX0.0zgizWWXLIHiKdNUAJ3yKaIaxEKsHoFeEIo8IUAMtHU';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -84,12 +92,19 @@
             toast.textContent = msg;
             toast.style.borderLeftColor = isError ? 'var(--trade-red)' : 'var(--trade-green)';
             toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 4000);
+            setTimeout(() => { toast.style.display = 'none'; }, 5000);
+        }
+        function showError(msg) {
+            const container = document.getElementById('error-container');
+            container.innerHTML = `<div class="error-banner">❌ ${msg}</div>`;
+            setTimeout(() => { container.innerHTML = ''; }, 8000);
         }
 
+        // Helper to ensure valid session
         async function ensureValidSession() {
             const { data: { session }, error: refreshError } = await supabaseClient.auth.refreshSession();
             if (refreshError || !session) {
+                console.error('Session refresh failed:', refreshError);
                 window.location.href = './pl.html';
                 return false;
             }
@@ -106,27 +121,9 @@
         function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         resizeCanvas(); window.addEventListener('resize', resizeCanvas);
         class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 1.5 + 0.3;
-                this.speedX = (Math.random() - 0.5) * 0.4;
-                this.speedY = (Math.random() - 0.5) * 0.4;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.y < 0) this.y = canvas.height;
-                if (this.y > canvas.height) this.y = 0;
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = '#D4AF37';
-                ctx.fill();
-            }
+            constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 1.5 + 0.3; this.speedX = (Math.random() - 0.5) * 0.4; this.speedY = (Math.random() - 0.5) * 0.4; }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0) this.x = canvas.width; if (this.x > canvas.width) this.x = 0; if (this.y < 0) this.y = canvas.height; if (this.y > canvas.height) this.y = 0; }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = '#D4AF37'; ctx.fill(); }
         }
         for (let i = 0; i < 60; i++) particles.push(new Particle());
         function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
@@ -134,8 +131,8 @@
 
         async function checkAdmin() {
             try {
-                const isValid = await ensureValidSession();
-                if (!isValid) return;
+                const valid = await ensureValidSession();
+                if (!valid) return;
 
                 const { data: profile, error: profileError } = await supabaseClient
                     .from('profiles')
@@ -144,38 +141,50 @@
                     .single();
 
                 if (profileError) {
-                    if (profileError.code === 'PGRST303' || profileError.message.includes('JWT expired')) {
-                        window.location.href = './pl.html';
-                        return;
-                    }
-                    throw profileError;
+                    console.error('Profile query error:', profileError);
+                    showError(`Failed to load admin profile: ${profileError.message}`);
+                    document.getElementById('admin-content').innerHTML = '<p style="color:var(--trade-red)">Error loading admin data. Check RLS policies.</p>';
+                    return;
                 }
+
                 if (!profile || profile.is_admin !== true) {
+                    showError('Access denied: You are not an administrator.');
                     document.getElementById('admin-content').innerHTML = '<p style="color:var(--trade-red)">Access denied. You are not an admin.</p>';
                     return;
                 }
+
                 document.getElementById('user-fullname').textContent = profile.first_name || 'Admin';
                 document.getElementById('user-initials').textContent = (profile.first_name || 'A')[0].toUpperCase();
                 document.getElementById('user-email-display').textContent = currentUser.email;
+
                 await loadAdminPanel();
                 await loadKYCQueue();
             } catch (err) {
                 console.error('Admin check error:', err);
-                document.getElementById('admin-content').innerHTML = '<p style="color:var(--trade-red)">Error loading admin panel. Please refresh.</p>';
+                showError('Unexpected error: ' + err.message);
             }
         }
 
         async function loadAdminPanel() {
-            const { data: users, error: usersError } = await supabaseClient.from('profiles').select('*');
-            if (usersError) console.error(usersError);
-            else allUsers = users || [];
-            const { data: assets, error: assetsError } = await supabaseClient.from('user_assets').select('*');
-            if (assetsError) console.error(assetsError);
-            else allAssets = assets || [];
-            renderAdmin();
+            try {
+                const { data: users, error: usersError } = await supabaseClient.from('profiles').select('*');
+                if (usersError) throw usersError;
+                allUsers = users || [];
+                const { data: assets, error: assetsError } = await supabaseClient.from('user_assets').select('*');
+                if (assetsError) throw assetsError;
+                allAssets = assets || [];
+                renderAdmin();
+            } catch (err) {
+                console.error('Load admin panel error:', err);
+                document.getElementById('admin-content').innerHTML = '<p style="color:var(--trade-red)">Failed to load admin panel. Check your RLS policies and stack depth.</p>';
+            }
         }
 
         function renderAdmin() {
+            if (!allUsers.length) {
+                document.getElementById('admin-content').innerHTML = '<p>No users found.</p>';
+                return;
+            }
             let html = '<table><thead><tr><th>Email</th><th>Assets</th><th>Actions</th></tr></thead><tbody>';
             allUsers.forEach(user => {
                 const userAssets = allAssets.filter(a => a.user_id === user.id);
@@ -218,7 +227,7 @@
             }
         }
 
-        async function loadKYCQueue(force = false) {
+        async function loadKYCQueue() {
             try {
                 const { data: pendingUsers, error } = await supabaseClient
                     .from('profiles')
@@ -259,39 +268,33 @@
 
         async function approveKYC(userId) {
             if (!confirm('Approve this user\'s KYC?')) return;
-            const { data, error } = await supabaseClient
+            const { error } = await supabaseClient
                 .from('profiles')
                 .update({ kyc_status: 'verified' })
-                .eq('id', userId)
-                .select();
+                .eq('id', userId);
             if (error) {
+                showToast('Error: ' + error.message, true);
                 console.error('Approve error:', error);
-                showToast('Error: ' + error.message + ' (Check RLS policies)', true);
-            } else if (data && data.length > 0 && data[0].kyc_status === 'verified') {
+            } else {
                 showToast('KYC approved successfully!');
                 await loadKYCQueue();
                 await loadAdminPanel();
-            } else {
-                showToast('Failed to update. No rows returned.', true);
             }
         }
 
         async function rejectKYC(userId) {
             if (!confirm('Reject this user\'s KYC?')) return;
-            const { data, error } = await supabaseClient
+            const { error } = await supabaseClient
                 .from('profiles')
                 .update({ kyc_status: 'rejected' })
-                .eq('id', userId)
-                .select();
+                .eq('id', userId);
             if (error) {
+                showToast('Error: ' + error.message, true);
                 console.error('Reject error:', error);
-                showToast('Error: ' + error.message + ' (Check RLS policies)', true);
-            } else if (data && data.length > 0 && data[0].kyc_status === 'rejected') {
+            } else {
                 showToast('KYC rejected.');
                 await loadKYCQueue();
                 await loadAdminPanel();
-            } else {
-                showToast('Failed to update. No rows returned.', true);
             }
         }
 
