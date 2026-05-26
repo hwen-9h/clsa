@@ -236,6 +236,16 @@
             padding: 6px 12px;
             font-size: 11px;
             color: #f97387;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .warning-badge svg {
+            width: 12px;
+            height: 12px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
         }
         .region-badge {
             background: var(--brand-yellow-dim);
@@ -244,6 +254,16 @@
             padding: 6px 12px;
             font-size: 11px;
             color: var(--brand-yellow);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .region-badge svg {
+            width: 12px;
+            height: 12px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
         }
         .tabs {
             display: flex;
@@ -324,6 +344,16 @@
             padding: 4px 10px;
             border-radius: 20px;
             font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .payment-method svg {
+            width: 12px;
+            height: 12px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
         }
         .action-btn {
             background: var(--brand-yellow);
@@ -432,8 +462,14 @@
             <div class="p2p-header">
                 <h1>Express P2P Block Trade</h1>
                 <div class="p2p-sub">
-                    <span class="warning-badge">⚠️ Stay vigilant. Trade only within platform.</span>
-                    <span id="region-badge" class="region-badge">Loading region...</span>
+                    <span class="warning-badge">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zM12 9v6M12 17v2"/></svg>
+                        Stay vigilant. Trade only within platform.
+                    </span>
+                    <span id="region-badge" class="region-badge">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        Loading region...
+                    </span>
                 </div>
             </div>
 
@@ -518,7 +554,10 @@
                 userCurrency = currencyData;
                 // Get payment methods for this country
                 availablePaymentMethods = paymentMethodsByCountry[userCountryCode] || ['Bank Transfer', 'PayPal'];
-                document.getElementById('region-badge').innerHTML = `🌍 ${countryName} · ${userCurrency.symbol}${userCurrency.code}`;
+                document.getElementById('region-badge').innerHTML = `
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    ${countryName} · ${userCurrency.symbol}${userCurrency.code}
+                `;
                 const filterAmount = document.getElementById('filter-amount');
                 if (filterAmount) filterAmount.placeholder = `Min amount (${userCurrency.code})`;
                 // Update payment dropdowns
@@ -527,7 +566,10 @@
                 console.warn('IP detection failed, using US fallback', err);
                 userCountryCode = 'US';
                 availablePaymentMethods = ['Bank Transfer', 'PayPal'];
-                document.getElementById('region-badge').innerHTML = '🌍 Global · USD';
+                document.getElementById('region-badge').innerHTML = `
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    Global · USD
+                `;
                 updatePaymentDropdowns();
             }
         }
@@ -737,7 +779,10 @@
                                 <div class="order-limits">Limits: ${userCurrency.symbol}${minLimitLocal} - ${userCurrency.symbol}${maxLimitLocal}</div>
                                 <div class="order-amount">Amount: ${ad.amount} ${ad.asset_symbol}</div>
                             </div>
-                            <div class="payment-method">📋 ${ad.payment_method}</div>
+                            <div class="payment-method">
+                                <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M12 9v4M10 11h4"/></svg>
+                                ${ad.payment_method}
+                            </div>
                             ${currentProfile.kyc_status === 'verified' && ad.user_id !== currentUser.id ? `<button class="action-btn" onclick="showTradeConfirm('${ad.id}')">Buy</button>` : (ad.user_id === currentUser.id ? '<span class="status-badge status-open">Your ad</span>' : '')}
                         </div>
                     `;
@@ -783,7 +828,10 @@
                                 <div class="order-limits">Limits: ${userCurrency.symbol}${minLimitLocal} - ${userCurrency.symbol}${maxLimitLocal}</div>
                                 <div class="order-amount">Amount: ${ad.amount} ${ad.asset_symbol}</div>
                             </div>
-                            <div class="payment-method">📋 ${ad.payment_method}</div>
+                            <div class="payment-method">
+                                <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M12 9v4M10 11h4"/></svg>
+                                ${ad.payment_method}
+                            </div>
                             ${currentProfile.kyc_status === 'verified' && ad.user_id !== currentUser.id ? `<button class="action-btn" onclick="showTradeConfirm('${ad.id}')">Sell</button>` : (ad.user_id === currentUser.id ? '<span class="status-badge status-open">Your ad</span>' : '')}
                         </div>
                     `;
@@ -839,7 +887,10 @@
                 container.innerHTML = `
                     <div class="create-form">
                         <h3>Create New Ad (Price in USD)</h3>
-                        <p style="font-size:12px; margin-bottom:12px;">🌍 Your ad will be visible only to users in <strong>${userCountryCode}</strong>.</p>
+                        <p style="font-size:12px; margin-bottom:12px;">
+                            <svg viewBox="0 0 24 24" width="12" height="12" style="vertical-align:middle;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            Your ad will be visible only to users in <strong>${userCountryCode}</strong>.
+                        </p>
                         <select id="ad-type"><option value="sell">Sell</option><option value="buy">Buy</option></select>
                         <select id="ad-coin"><option value="USDT">USDT</option><option value="BTC">BTC</option><option value="ETH">ETH</option></select>
                         <input type="number" id="ad-amount" placeholder="Amount (crypto)">
@@ -848,7 +899,6 @@
                         <button class="btn-primary" onclick="createAd()" style="width:100%;">Post Ad</button>
                     </div>
                 `;
-                // Re-attach change listener for payment methods if needed (none required)
             }
         }
 
